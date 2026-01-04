@@ -3,7 +3,7 @@ import isPrivateNetwork from './isPrivateNetwork';
 import parseUrl from '../utils/parseUrl';
 
 export default ({ imageUrl, pageUrl, compressed, proxyUrl, disabledHosts, enabled, type = 'image' }) => {
-  imageUrl = imageUrl.replace('#bh-no-compress=1', '');
+  imageUrl = imageUrl.replace('#bh-no-compress=1', '').replace(/[\?&]bh-allow=1/, '');
 
   // If we aren't enabled we don't have to do anything.
   if (!enabled) {

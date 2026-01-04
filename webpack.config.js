@@ -13,7 +13,8 @@ module.exports = (env, argv) => {
     entry: {
       popup: './src/popup.js',
       setup: './src/setup.js',
-      background: './src/background.js'
+      background: './src/background.js',
+      content: './src/content/imageProcessor.js'
     },
     output: {
       path: path.resolve(__dirname, 'dist'),
@@ -24,7 +25,8 @@ module.exports = (env, argv) => {
       extensions: ['.js', '.jsx', '.json'],
       fallback: {
         "buffer": require.resolve("buffer"),
-        "process": require.resolve("process/browser")
+        "process": require.resolve("process/browser"),
+        "path": require.resolve("path-browserify")
       },
       alias: {
         "process/browser": require.resolve("process/browser.js")
