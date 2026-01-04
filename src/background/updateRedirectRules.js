@@ -12,69 +12,42 @@ export default async function updateRedirectRules(state) {
     return;
   }
 
-  const { proxyUrl, convertBw, compressionLevel, isWebpSupported, disabledHosts } = state;
-
-  // Parse params for the proxy
-  // NOTE: In MV3 regexSubstitution, we cannot url-encode the capture group.
-  // We must rely on putting the URL as the last parameter so the proxy can parse it correctly
-  // even if it contains query parameters.
-  // Expected Proxy URL format: proxyUrl?jpeg=X&bw=Y&l=Z&url=ORIGINAL_URL
-
-  const isJpeg = isWebpSupported ? 0 : 1;
-  const isBw = convertBw ? 1 : 0;
-  const level = compressionLevel;
-
-  // Construct the base of the redirect URL
-  // Remove trailing slash if present
-  const cleanProxy = proxyUrl.replace(/\/$/, '');
-  const redirectPath = `${cleanProxy}?jpeg=${isJpeg}&bw=${isBw}&l=${level}&url=\\0`;
-
-  // Rule 1: Redirect Images
-  // We filter out the proxy itself to prevent infinite loops
+  // Rule 1: Allow specific requests with our bypass param (High Priority)
+  // Rule 2: Block all other image requests to save bandwidth (Low Priority)
+  
   try {
       const proxyHostname = new URL(proxyUrl).hostname;
       const excludedDomains = [...disabledHosts, proxyHostname, 'localhost', '127.0.0.1'];
 
-      const redirectRule = {
+      const allowRule = {
         id: 1,
+        priority: 2,
+        action: {
+          type: 'allow'
+        },
+        condition: {
+          regexFilter: ".*[?&]bh-allow=1.*",
+          resourceTypes: ["image", "xmlhttprequest"]
+        }
+      };
+
+      const blockRule = {
+        id: 2,
         priority: 1,
         action: {
-          type: 'redirect',
-          redirect: {
-            regexSubstitution: redirectPath
-          }
+          type: 'block'
         },
         condition: {
           regexFilter: "^https?://.+$",
-          resourceTypes: ["image", "xmlhttprequest"],
+          resourceTypes: ["image"],
           excludedInitiatorDomains: excludedDomains,
           excludedRequestDomains: excludedDomains
         }
       };
 
-      // Rule 2: Patch CSP Headers to allow loading images from proxy
-      const cspRule = {
-        id: 2,
-        priority: 1,
-        action: {
-          type: 'modifyHeaders',
-          responseHeaders: [
-            { header: 'content-security-policy', operation: 'set', value: '' }
-            // Note: completely clearing CSP is drastic but simplest for 'patchContentSecurity' equivalent
-            // A safer approach would be parsing and appending, but DNR static modification is limited.
-            // For better security, we should ideally parse and append the proxy host to img-src,
-            // but DNR requires static string values or regex replace on headers which is complex for CSP.
-            // Removing block-all-mixed-content is also common.
-          ]
-        },
-        condition: {
-          resourceTypes: ["main_frame", "sub_frame"]
-        }
-      };
-
       await chrome.declarativeNetRequest.updateDynamicRules({
         removeRuleIds: [1, 2],
-        addRules: [redirectRule] // Adding cspRule is optional/experimental depending on strictness needed
+        addRules: [allowRule, blockRule]
       });
 
       await updateIcon(true);
