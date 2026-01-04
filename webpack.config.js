@@ -1,94 +1,110 @@
-const path = require('path')
-const webpack = require('webpack')
-const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-const HtmlWebpackPlugin = require('html-webpack-plugin')
-const CopyWebpackPlugin = require('copy-webpack-plugin')
+const path = require('path');
+const webpack = require('webpack');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
-module.exports = env => {
+module.exports = (env, argv) => {
+  const isProduction = argv.mode === 'production';
 
-return{
-  mode: env.NODE_ENV,
-  devtool: 'inline-source-map',
-  entry: {
-    popup: './src/popup.js',
-    setup: './src/setup.js',
-    background: './src/background.js',
-    update: './src/update.js'
-  },
-  output: {
-    path: path.resolve(__dirname, 'dist'),
-    filename: '[name].bundle.js'
-  },
-  module: {
-    rules: [
-      {
-        test: /\.js$/,
-        include: [
-          path.resolve(__dirname, './src'),
-          /pretty-bytes/ // <- ES6 module
-        ],
-        loader: 'babel-loader'
+  return {
+    mode: isProduction ? 'production' : 'development',
+    devtool: isProduction ? false : 'cheap-module-source-map',
+    entry: {
+      popup: './src/popup.js',
+      setup: './src/setup.js',
+      background: './src/background.js'
+    },
+    output: {
+      path: path.resolve(__dirname, 'dist'),
+      filename: '[name].bundle.js',
+      clean: true
+    },
+    resolve: {
+      extensions: ['.js', '.jsx', '.json'],
+      fallback: {
+        "buffer": require.resolve("buffer"),
+        "process": require.resolve("process/browser")
       },
-      {
-        test: /\.css$/,
-        use: [
-          {
-            loader: MiniCssExtractPlugin.loader
-          },
-          'css-loader'
-        ]
-      },
-      {
-        test: /\.(ico|eot|otf|webp|ttf|woff|woff2)(\?.*)?$/,
-        use: 'file-loader?limit=100000'
-      },
-      {
-        test: /\.(jpe?g|png|gif|svg)$/i,
-        use: [
-          'file-loader?limit=100000',
-          {
-            loader: 'img-loader',
+      alias: {
+        "process/browser": require.resolve("process/browser.js")
+      }
+
+    },
+    module: {
+      rules: [
+        {
+          test: /\.js$/,
+          exclude: /node_modules/,
+          use: {
+            loader: 'babel-loader',
             options: {
-              enabled: true,
-              optipng: true
+              presets: ['@babel/preset-env', '@babel/preset-react'],
+              plugins: ['@babel/plugin-transform-runtime']
             }
           }
+        },
+        {
+          test: /\.css$/,
+          use: [MiniCssExtractPlugin.loader, 'css-loader']
+        },
+        {
+          // Webpack 5 Asset Modules replace file-loader/url-loader
+          test: /\.(ico|eot|otf|webp|ttf|woff|woff2)$/i,
+          type: 'asset/resource',
+          generator: {
+            filename: 'assets/[hash][ext][query]'
+          }
+        },
+        {
+          test: /\.(jpe?g|png|gif|svg)$/i,
+          type: 'asset/resource',
+          generator: {
+            filename: 'assets/[hash][ext][query]'
+          }
+        }
+      ]
+    },
+    performance: {
+      hints: false
+    },
+    plugins: [
+      new MiniCssExtractPlugin({
+        filename: '[name].css'
+      }),
+      new HtmlWebpackPlugin({
+        inject: true,
+        chunks: ['popup'],
+        filename: 'popup.html',
+        template: './src/popup.html'
+      }),
+      new HtmlWebpackPlugin({
+        inject: true,
+        chunks: ['setup'],
+        filename: 'setup.html',
+        template: './src/setup.html'
+      }),
+      new CopyWebpackPlugin({
+        patterns: [
+          { from: './src/manifest.json' },
+          { from: './src/assets/icon-*.png', to: 'assets/[name][ext]' }
         ]
-      }
-    ]
-  },
-  stats: {
-    children: false,
-    chunks: false,
-    chunkModules: false,
-    chunkOrigins: false,
-    modules: false
-  },
-  performance: {
-    hints: false
-  },
-  plugins: [
-    new MiniCssExtractPlugin({
-      filename: '[name].css',
-      chunkFilename: '[id].css'
-    }),
-    new HtmlWebpackPlugin({
-      inject: true,
-      chunks: ['popup'],
-      filename: 'popup.html',
-      template: './src/popup.html'
-    }),
-    new HtmlWebpackPlugin({
-      inject: true,
-      chunks: ['setup'],
-      filename: 'setup.html',
-      template: './src/setup.html'
-    }),
-    // copy extension manifest and icons
-    new CopyWebpackPlugin([
-      { from: './src/manifest.json' },
-      { context: './src/assets', from: 'icon-**', to: 'assets' }
-    ])
-  ],
+      }),
+      // Provide polyfills for Node.js globals
+      new webpack.ProvidePlugin({
+        process: require.resolve("process/browser.js"),
+        Buffer: [require.resolve("buffer"), 'Buffer'],
+      }),
+      // Define environment variables
+      new webpack.DefinePlugin({
+        'process.env.NODE_ENV': JSON.stringify(isProduction ? 'production' : 'development')
+      })
+    ],
+    // Handle Node.js globals for browser environment
+    node: {
+      global: true,
+      __filename: false,
+      __dirname: false,
+    }
+  };
 };
-}
