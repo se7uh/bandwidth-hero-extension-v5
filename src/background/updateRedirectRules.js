@@ -1,15 +1,7 @@
-import defaultState from './defaults';
-import getHeaderIntValue from './background/getHeaderIntValue';
 import { Netmask } from 'netmask';
 
-// In Manifest V3, background scripts are Service Workers.
-// We cannot block requests with webRequest.onBeforeRequest anymore.
-// We must use chrome.declarativeNetRequest.
-
-const STORAGE_KEY_STATS = 'statistics';
-
 // Helper to update dynamic DNR rules based on state
-async function updateRedirectRules(state) {
+export default async function updateRedirectRules(state) {
   if (!state.enabled || !state.proxyUrl) {
     // If disabled or no proxy, clear rules
     await chrome.declarativeNetRequest.updateDynamicRules({
@@ -98,30 +90,3 @@ async function updateIcon(isEnabled) {
     await chrome.action.setIcon({ path: iconPath });
   }
 }
-
-// --- Event Listeners ---
-
-chrome.runtime.onInstalled.addListener(async () => {
-  const stored = await chrome.storage.local.get(null);
-  const state = { ...defaultState, ...stored };
-
-  // Check WebP support (hardcoded true for modern Chrome/Edge)
-  state.isWebpSupported = true;
-  await chrome.storage.local.set(state);
-
-  await updateRedirectRules(state);
-});
-
-chrome.storage.onChanged.addListener(async (changes, namespace) => {
-  if (namespace !== 'local') return;
-
-  const stored = await chrome.storage.local.get(null);
-  const state = { ...defaultState, ...stored };
-
-  // If specific keys changed, update rules
-  if (changes.proxyUrl || changes.enabled || changes.convertBw || changes.compressionLevel || changes.disabledHosts) {
-    await updateRedirectRules(state);
-  }
-});
-
-
