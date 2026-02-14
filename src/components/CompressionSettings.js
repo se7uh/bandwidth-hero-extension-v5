@@ -1,6 +1,7 @@
 import React from 'react'
-import { Form, Input, Checkbox, Dropdown, Button } from 'semantic-ui-react'
-import defaults from '../defaults'
+import { Stack, Checkbox, Select, Button } from '@mantine/core'
+import { IconSettings } from '@tabler/icons-react'
+import defaults from '../defaults.js'
 
 export default ({ convertBw, compressionLevel, onConvertBwChange, onCompressionLevelChange, isWebpSupported }) => {
   const compressionToText = (description, value) => {
@@ -8,13 +9,13 @@ export default ({ convertBw, compressionLevel, onConvertBwChange, onCompressionL
     return `${description} compression (${extension} ${value})`;
   };
   const compressionLevelOptions = [
-    { key: 80, value: 80, text: compressionToText('Low', 80) },
-    { key: 60, value: 60, text: compressionToText('Medium', 60) },
-    { key: 40, value: 40, text: compressionToText('High', 40) },
-    { key: 20, value: 20, text: compressionToText('Extreme', 20) }
+    { value: '80', label: compressionToText('Low', 80) },
+    { value: '60', label: compressionToText('Medium', 60) },
+    { value: '40', label: compressionToText('High', 40) },
+    { value: '20', label: compressionToText('Extreme', 20) }
   ]
   return (
-    <div>
+    <Stack>
       <div>
         <Checkbox
           label="Convert to black & white"
@@ -22,24 +23,23 @@ export default ({ convertBw, compressionLevel, onConvertBwChange, onCompressionL
           onChange={onConvertBwChange}
         />
       </div>
-      <div style={{ marginTop: '1em' }}>
-        <Dropdown
-          selection
-          options={compressionLevelOptions}
-          value={compressionLevel}
-          onChange={onCompressionLevelChange}
-          fluid
+      <div>
+        <Select
+          data={compressionLevelOptions}
+          value={String(compressionLevel)}
+          onChange={(value) => onCompressionLevelChange(null, { value: parseInt(value) })}
         />
       </div>
-      <div style={{ marginTop: '1em' }}>
-          <Button
-          basic
-          fluid
-          content="Configure data compression service"
-          icon="setting"
+      <div>
+        <Button
+          variant="outline"
+          fullWidth
+          leftSection={<IconSettings size={16} />}
           onClick={() => chrome.tabs.create({ url: chrome.runtime.getURL('setup/index.html') })}
-        />
+        >
+          Configure data compression service
+        </Button>
       </div>
-    </div>
+    </Stack>
   )
 }

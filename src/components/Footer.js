@@ -1,24 +1,29 @@
 import React from 'react'
-import { Button, Container } from 'semantic-ui-react'
+import { Group, Button } from '@mantine/core'
+import { IconHome, IconHeart } from '@tabler/icons-react'
 
 export default () => {
   return (
-    <Container className="footer" textAlign="right">
+    <Group justify="flex-end" p="sm">
       <Button
-        basic
-        content="How it works?"
+        variant="outline"
+        component="a"
         href="https://bandwidth-hero.com/"
         target="_blank"
-        icon="home"
-      />
+        leftSection={<IconHome size={16} />}
+      >
+        How it works?
+      </Button>
       <Button
-        basic
+        variant="outline"
         color="orange"
+        component="a"
         href="https://paypal.me/ayastreb"
         target="_blank"
-        content="Donate!"
-        icon="heart outline"
-      />
-    </Container>
+        leftSection={<IconHeart size={16} />}
+      >
+        Donate!
+      </Button>
+    </Group>
   )
 }

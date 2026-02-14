@@ -1,6 +1,13 @@
 import React from 'react'
-import { Segment, Statistic } from 'semantic-ui-react'
-import prettyBytes from 'pretty-bytes'
+import { Paper, Group, Text } from '@mantine/core'
+
+function formatBytes(bytes) {
+  if (bytes === 0) return '0 B'
+  const k = 1024
+  const sizes = ['B', 'KB', 'MB', 'GB']
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+}
 
 export default ({ filesProcessed = 0, bytesProcessed = 0, bytesSaved = 0 }) => {
   const dataSavedPercentage = () => {
@@ -10,19 +17,25 @@ export default ({ filesProcessed = 0, bytesProcessed = 0, bytesSaved = 0 }) => {
   }
 
   return (
-    <Segment attached>
-      <Statistic.Group size="mini" color="blue" widths={2}>
-        <Statistic>
-          <Statistic.Value>{filesProcessed.toLocaleString()}</Statistic.Value>
-          <Statistic.Label>Images processed</Statistic.Label>
-        </Statistic>
-        <Statistic>
-          <Statistic.Value>
-            {prettyBytes(bytesSaved)} ({dataSavedPercentage()})
-          </Statistic.Value>
-          <Statistic.Label>Data saved</Statistic.Label>
-        </Statistic>
-      </Statistic.Group>
-    </Segment>
+    <Paper withBorder p="sm">
+      <Group grow>
+        <div>
+          <Text size="xl" fw={700} c="blue">
+            {filesProcessed.toLocaleString()}
+          </Text>
+          <Text size="sm" c="dimmed">
+            Images processed
+          </Text>
+        </div>
+        <div>
+          <Text size="xl" fw={700} c="blue">
+            {formatBytes(bytesSaved)} ({dataSavedPercentage()})
+          </Text>
+          <Text size="sm" c="dimmed">
+            Data saved
+          </Text>
+        </div>
+      </Group>
+    </Paper>
   )
 }

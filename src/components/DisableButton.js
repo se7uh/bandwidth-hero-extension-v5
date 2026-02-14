@@ -1,5 +1,5 @@
 import React from 'react'
-import { Segment, Button } from 'semantic-ui-react'
+import { Paper, Button } from '@mantine/core'
 import parseUrl from '../utils/parseUrl.js'
 
 export default ({ disabledHosts, currentUrl, onSiteDisable, onSiteEnable }) => {
@@ -8,15 +8,29 @@ export default ({ disabledHosts, currentUrl, onSiteDisable, onSiteEnable }) => {
   if (!/^https?:/i.test(schema)) return null
   if (disabledHosts.includes(hostname)) {
     return (
-      <Segment attached>
-        <Button content="Enable on this site" onClick={onSiteEnable} basic negative fluid />
-      </Segment>
+      <Paper withBorder p="sm">
+        <Button 
+          onClick={onSiteEnable} 
+          variant="outline" 
+          color="red"
+          fullWidth
+        >
+          Enable on this site
+        </Button>
+      </Paper>
     )
   } else {
     return (
-      <Segment attached>
-        <Button content="Disable on this site" onClick={onSiteDisable} basic positive fluid />
-      </Segment>
+      <Paper withBorder p="sm">
+        <Button 
+          onClick={onSiteDisable} 
+          variant="outline" 
+          color="green"
+          fullWidth
+        >
+          Disable on this site
+        </Button>
+      </Paper>
     )
   }
 }

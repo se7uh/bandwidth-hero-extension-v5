@@ -1,7 +1,8 @@
 import React from 'react'
 import { createRoot } from 'react-dom/client'
 import { HashRouter as Router, Route } from 'react-router-dom'
-import 'semantic-ui-css/semantic.min.css'
+import { MantineProvider } from '@mantine/core'
+import '@mantine/core/styles.css'
 import Header from '../components/Header.js'
 import Home from '../components/Home.js'
 import Footer from '../components/Footer.js'
@@ -27,7 +28,6 @@ class Popup extends React.Component {
   }
 
   componentDidMount() {
-    // Load initial state
     chrome.storage.local.get(null, (stored) => {
       this.setState({
         enabled: stored.enabled ?? defaults.enabled,
@@ -40,7 +40,6 @@ class Popup extends React.Component {
       })
     })
 
-    // Listen for state changes
     chrome.storage.onChanged.addListener(this.stateWasUpdatedFromBackground)
   }
 
@@ -108,36 +107,37 @@ class Popup extends React.Component {
 
   render() {
     return (
-      <Router>
-        <div style={{ width: '380px' }}>
-          <Header enabled={this.state.enabled} onChange={this.enableSwitchWasChanged} />
-          <Route
-            exact
-            path="/"
-            render={() => (
-              <Home
-                statistics={this.state.statistics}
-                disabledHosts={this.state.disabledHosts}
-                currentUrl={this.props.currentUrl}
-                compressionLevel={this.state.compressionLevel}
-                convertBw={this.state.convertBw}
-                onSiteDisable={this.siteWasDisabled}
-                onSiteEnable={this.siteWasEnabled}
-                disabledOnChange={this.disabledHostsWasChanged}
-                convertBwOnChange={this.convertBwWasChanged}
-                isWebpSupported={this.state.isWebpSupported}
-                compressionLevelOnChange={this.compressionLevelWasChanged}
-              />
-            )}
-          />
-          <Footer />
-        </div>
-      </Router>
+      <MantineProvider>
+        <Router>
+          <div style={{ width: '380px' }}>
+            <Header enabled={this.state.enabled} onChange={this.enableSwitchWasChanged} />
+            <Route
+              exact
+              path="/"
+              render={() => (
+                <Home
+                  statistics={this.state.statistics}
+                  disabledHosts={this.state.disabledHosts}
+                  currentUrl={this.props.currentUrl}
+                  compressionLevel={this.state.compressionLevel}
+                  convertBw={this.state.convertBw}
+                  onSiteDisable={this.siteWasDisabled}
+                  onSiteEnable={this.siteWasEnabled}
+                  disabledOnChange={this.disabledHostsWasChanged}
+                  convertBwOnChange={this.convertBwWasChanged}
+                  isWebpSupported={this.state.isWebpSupported}
+                  compressionLevelOnChange={this.compressionLevelWasChanged}
+                />
+              )}
+            />
+            <Footer />
+          </div>
+        </Router>
+      </MantineProvider>
     )
   }
 }
 
-// Initialize popup
 chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
   const currentUrl = tabs[0]?.url || ''
   
