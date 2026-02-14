@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Segment, Accordion, Icon } from 'semantic-ui-react'
+import { Paper, Accordion } from '@mantine/core'
 import ManageDisabled from './ManageDisabled.js'
 import CompressionSettings from './CompressionSettings.js'
 
@@ -12,46 +12,39 @@ export default ({
   isWebpSupported,
   compressionLevelOnChange
 }) => {
-  const [activeIndex, setActiveIndex] = useState(-1)
+  const [activeIndex, setActiveIndex] = useState(null)
 
-  const handleClick = (e, titleProps) => {
-    const { index } = titleProps
-    const newIndex = activeIndex === index ? -1 : index
-    setActiveIndex(newIndex)
+  const handleChange = (value) => {
+    setActiveIndex(value)
   }
 
   return (
-    <Segment attached>
-      <Accordion>
-        <Accordion.Title
-          active={activeIndex === 0}
-          index={0}
-          onClick={handleClick}
-        >
-          <Icon name="dropdown" />
-          Manage disabled sites
-        </Accordion.Title>
-        <Accordion.Content active={activeIndex === 0}>
-          <ManageDisabled disabledHosts={disabledHosts} onChange={disabledOnChange} />
-        </Accordion.Content>
-        <Accordion.Title
-          active={activeIndex === 1}
-          index={1}
-          onClick={handleClick}
-        >
-          <Icon name="dropdown" />
-          Compression settings
-        </Accordion.Title>
-        <Accordion.Content active={activeIndex === 1}>
-          <CompressionSettings
-            convertBw={convertBw}
-            isWebpSupported={isWebpSupported}
-            compressionLevel={compressionLevel}
-            onConvertBwChange={convertBwOnChange}
-            onCompressionLevelChange={compressionLevelOnChange}
-          />
-        </Accordion.Content>
+    <Paper withBorder p="sm">
+      <Accordion value={activeIndex} onChange={handleChange}>
+        <Accordion.Item value="disabled">
+          <Accordion.Control>
+            Manage disabled sites
+          </Accordion.Control>
+          <Accordion.Panel>
+            <ManageDisabled disabledHosts={disabledHosts} onChange={disabledOnChange} />
+          </Accordion.Panel>
+        </Accordion.Item>
+
+        <Accordion.Item value="settings">
+          <Accordion.Control>
+            Compression settings
+          </Accordion.Control>
+          <Accordion.Panel>
+            <CompressionSettings
+              convertBw={convertBw}
+              isWebpSupported={isWebpSupported}
+              compressionLevel={compressionLevel}
+              onConvertBwChange={convertBwOnChange}
+              onCompressionLevelChange={compressionLevelOnChange}
+            />
+          </Accordion.Panel>
+        </Accordion.Item>
       </Accordion>
-    </Segment>
+    </Paper>
   )
 }
