@@ -38,7 +38,8 @@ export default async function updateRedirectRules(state) {
           type: 'block'
         },
         condition: {
-          regexFilter: "^https?://.+\\.(jpg|jpeg|png|gif|webp|bmp|ico|svg)(\\?.*)?$",
+          // Block only larger image types (skip ico, svg - already small)
+          regexFilter: "^https?://.+\\.(jpg|jpeg|png|gif|webp|bmp)(\\?.*)?$",
           resourceTypes: ["image"],
           excludedInitiatorDomains: excludedDomains,
           excludedRequestDomains: excludedDomains
