@@ -9,7 +9,7 @@ interface HeaderProps {
 
 export default ({ enabled, onChange, pt = 'md' }: HeaderProps) => {
   return (
-    <Box bg="#2b69e3" c="white" px="md" pt={pt} pb={0}>
+    <Box bg="#2b69e3" c="white" px="md" pt={0} pb={5}>
       <Group justify="space-between" align="center">
         <Text fw={700} size="xl" c="white">
           Bandwidth Hero
