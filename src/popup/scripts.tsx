@@ -1,33 +1,35 @@
 import React from 'react'
 import { createRoot } from 'react-dom/client'
 import { HashRouter as Router, Route } from 'react-router-dom'
-import { MantineProvider, useMantineColorScheme, ActionIcon } from '@mantine/core'
+import { MantineProvider } from '@mantine/core'
 import '@mantine/core/styles.css'
-import Header from '../components/Header.js'
-import Home from '../components/Home.js'
-import Footer from '../components/Footer.js'
-import parseUrl from '../utils/parseUrl.js'
-import defaults from '../defaults.js'
+import Header from '../components/Header'
+import Home from '../components/Home'
+import Footer from '../components/Footer'
+import parseUrl from '../utils/parseUrl'
+import defaults from '../defaults'
 
-// Color scheme toggle component
-function ColorSchemeToggle() {
-  const { colorScheme, toggleColorScheme } = useMantineColorScheme()
-  
-  return (
-    <ActionIcon 
-      onClick={() => toggleColorScheme()} 
-      variant="default" 
-      size="md"
-      style={{ marginLeft: '10px' }}
-      title={colorScheme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-    >
-      {colorScheme === 'dark' ? '☀️' : '🌙'}
-    </ActionIcon>
-  )
+interface PopupState {
+  enabled: boolean
+  statistics: {
+    filesProcessed: number
+    bytesProcessed: number
+    bytesSaved: number
+  }
+  disabledHosts: string[]
+  convertBw: boolean
+  compressionLevel: number
+  isWebpSupported: boolean
+  proxyUrl: string
+  colorScheme: 'light' | 'dark'
 }
 
-class Popup extends React.Component {
-  constructor(props) {
+interface PopupProps {
+  currentUrl: string
+}
+
+class Popup extends React.Component<PopupProps, PopupState> {
+  constructor(props: PopupProps) {
     super(props)
     this.state = {
       enabled: true,
@@ -46,7 +48,7 @@ class Popup extends React.Component {
   }
 
   componentDidMount() {
-    chrome.storage.local.get(null, (stored) => {
+    chrome.storage.local.get(null, (stored: any) => {
       this.setState({
         enabled: stored.enabled ?? defaults.enabled,
         statistics: stored.statistics ?? defaults.statistics,
@@ -92,7 +94,7 @@ class Popup extends React.Component {
     })
   }
 
-  disabledHostsWasChanged = (_, { value }) => {
+  disabledHostsWasChanged = (_: any, { value }: { value: string }) => {
     this.setState(() => {
       const disabledHosts = value.split('\n')
       chrome.storage.local.set({ disabledHosts })
@@ -108,23 +110,23 @@ class Popup extends React.Component {
     })
   }
 
-  compressionLevelWasChanged = (_, { value }) => {
+  compressionLevelWasChanged = (_: any, { value }: { value: number }) => {
     this.setState(() => {
       chrome.storage.local.set({ compressionLevel: value })
       return { compressionLevel: value }
     })
   }
 
-  handleColorSchemeChange = (newColorScheme) => {
+  handleColorSchemeChange = (newColorScheme: 'light' | 'dark') => {
     chrome.storage.local.set({ colorScheme: newColorScheme })
     this.setState({ colorScheme: newColorScheme })
   }
 
-  stateWasUpdatedFromBackground = (changes) => {
+  stateWasUpdatedFromBackground = (changes: { [key: string]: chrome.storage.StorageChange }) => {
     const changedItems = Object.keys(changes)
     for (const item of changedItems) {
-      if (this.state[item] !== changes[item].newValue) {
-        this.setState({ [item]: changes[item].newValue })
+      if (this.state[item as keyof PopupState] !== changes[item].newValue) {
+        this.setState({ [item]: changes[item].newValue } as any)
       }
     }
   }
