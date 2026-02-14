@@ -48,7 +48,7 @@ export default ({
   }
 
   return (
-    <Stack gap="md">
+    <Stack gap="xs">
       <UsageStatistics
         filesProcessed={statistics.filesProcessed}
         bytesProcessed={statistics.bytesProcessed}

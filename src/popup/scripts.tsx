@@ -1,7 +1,7 @@
 import React from 'react'
 import { createRoot } from 'react-dom/client'
 import { HashRouter as Router, Route, Switch as RouterSwitch, withRouter, RouteComponentProps } from 'react-router-dom'
-import { MantineProvider, Tabs, Box, rem } from '@mantine/core'
+import { MantineProvider, Tabs, Box } from '@mantine/core'
 import { IconHome, IconWorld } from '@tabler/icons-react'
 import '@mantine/core/styles.css'
 import Header from '../components/Header'
@@ -134,11 +134,10 @@ class Popup extends React.Component<PopupProps, PopupState> {
     const { history, location } = this.props;
     const isHome = location.pathname === '/';
     const isSites = location.pathname === '/sites';
-    const isSettings = location.pathname === '/settings';
 
     return (
       <MantineProvider forceColorScheme="light" theme={{ primaryColor: 'blue' }}>
-        <Box style={{ width: '400px', minHeight: '550px', backgroundColor: 'white', display: 'flex', flexDirection: 'column' }}>
+        <Box style={{ width: '400px', minHeight: '450px', backgroundColor: 'white', display: 'flex', flexDirection: 'column' }}>
           <RouterSwitch>
             <Route path="/settings">
               <Settings 
@@ -149,29 +148,28 @@ class Popup extends React.Component<PopupProps, PopupState> {
             </Route>
             <Route path="*">
               <Box style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                <Box bg="#2b69e3" pt="md">
-                                                  <Header 
-                                                    enabled={this.state.enabled} 
-                                                    onChange={this.enableSwitchWasChanged}
-                                                    pt="lg"
-                                                  />
-                                                  <Tabs 
-                                                    value={isSites ? 'sites' : 'home'} 
-                                                    onChange={(val) => history.push(val === 'home' ? '/' : '/sites')}
-                                                    variant="unstyled"
-                                                    styles={{
-                                                      root: { display: 'flex', flexDirection: 'column' },
-                                                      list: {
-                                                        display: 'flex',
-                                                        padding: '0 12px',
-                                                        backgroundColor: '#2b69e3',
-                                                        borderBottom: 0,
-                                                        gap: '8px',
-                                                        marginTop: '10px',
-                                                      }
-                                                    }}
-                                                  >
-                                  
+                <Box bg="#2b69e3" pt="sm">
+                  <Header 
+                    enabled={this.state.enabled} 
+                    onChange={this.enableSwitchWasChanged}
+                    pt="md"
+                  />
+                  <Tabs 
+                    value={isSites ? 'sites' : 'home'} 
+                    onChange={(val) => history.push(val === 'home' ? '/' : '/sites')}
+                    variant="unstyled"
+                    styles={{
+                      root: { display: 'flex', flexDirection: 'column' },
+                      list: {
+                        display: 'flex',
+                        padding: '0 12px',
+                        backgroundColor: '#2b69e3',
+                        borderBottom: 0,
+                        gap: '8px',
+                        marginTop: '5px',
+                      }
+                    }}
+                  >
                     <Tabs.List grow>
                       <Tabs.Tab 
                         value="home" 
@@ -180,7 +178,7 @@ class Popup extends React.Component<PopupProps, PopupState> {
                           flex: 1,
                           backgroundColor: !isSites ? 'white' : 'rgba(0, 0, 0, 0.2)',
                           color: !isSites ? '#2b69e3' : 'white',
-                          padding: '12px 24px',
+                          padding: '8px 24px',
                           fontWeight: 700,
                           fontSize: '14px',
                           borderRadius: '8px 8px 0 0',
@@ -202,7 +200,7 @@ class Popup extends React.Component<PopupProps, PopupState> {
                           flex: 1,
                           backgroundColor: isSites ? 'white' : 'rgba(0, 0, 0, 0.2)',
                           color: isSites ? '#2b69e3' : 'white',
-                          padding: '12px 24px',
+                          padding: '8px 24px',
                           fontWeight: 700,
                           fontSize: '14px',
                           borderRadius: '8px 8px 0 0',
@@ -221,7 +219,7 @@ class Popup extends React.Component<PopupProps, PopupState> {
                   </Tabs>
                 </Box>
 
-                <Box bg="white" p="md" style={{ flex: 1 }}>
+                <Box bg="white" p="xs" style={{ flex: 1 }}>
                   <RouterSwitch>
                     <Route exact path="/">
                       <Home

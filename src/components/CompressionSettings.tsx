@@ -18,9 +18,9 @@ export default ({
   onConfigureProxy
 }: CompressionSettingsProps) => {
   return (
-    <Stack gap="md" mt="lg">
-      <Box p="md" style={{ border: '1px solid #eee', borderRadius: '8px' }}>
-        <Group justify="space-between" mb="xs">
+    <Stack gap="xs" mt="xs">
+      <Box p="xs" pb="xl" style={{ border: '1px solid #eee', borderRadius: '8px' }}>
+        <Group justify="space-between" mb={2}>
           <Text size="xs" fw={700} c="dimmed">COMPRESSION QUALITY</Text>
           <Box style={{ border: '1px solid #dee2e6', borderRadius: '4px', padding: '0 4px' }}>
             <Text size="xs" fw={700} c="blue">{compressionLevel}%</Text>
@@ -50,31 +50,42 @@ export default ({
             track: {
               height: rem(6),
             },
+            markWrapper: {
+              top: '50%',
+            },
+            mark: {
+              width: rem(8),
+              height: rem(8),
+              borderRadius: rem(8),
+              borderWidth: rem(2),
+              transform: 'translateY(-50%)',
+            },
             markLabel: {
-              fontSize: rem(10),
-              marginTop: rem(5),
+              fontSize: rem(9),
+              top: rem(10),
+              transform: 'translateX(-50%)',
             }
           }}
         />
       </Box>
 
-      <Group justify="space-between">
-        <Text size="md" fw={500}>Black & White Mode</Text>
+      <Group justify="space-between" mt={4} mb={4}>
+        <Text size="sm" fw={500}>Black & White Mode</Text>
         <Switch
           checked={convertBw}
           onChange={onConvertBwChange}
-          size="md"
+          size="sm"
         />
       </Group>
 
-      <Box mt="xl">
+      <Box mt="xs">
         <Button 
           variant="light"
           fullWidth
-          size="sm" 
+          size="xs" 
           onClick={onConfigureProxy}
-          leftSection={<IconSettings size={16} />}
-          mb="sm"
+          leftSection={<IconSettings size={14} />}
+          mb="xs"
         >
           Configure Proxy Service
         </Button>
@@ -82,7 +93,7 @@ export default ({
           <Button
             variant="outline"
             size="xs"
-            leftSection={<IconHelpCircle size={16} />}
+            leftSection={<IconHelpCircle size={14} />}
             onClick={() => window.open('https://bandwidth-hero.com/#how-it-works', '_blank')}
           >
             How it works?
@@ -91,7 +102,7 @@ export default ({
             variant="outline"
             color="orange"
             size="xs"
-            leftSection={<IconHeart size={16} />}
+            leftSection={<IconHeart size={14} />}
             onClick={() => window.open('https://www.paypal.me/ayastreb', '_blank')}
           >
             Donate!

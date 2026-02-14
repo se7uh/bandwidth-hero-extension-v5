@@ -19,33 +19,33 @@ export default ({ filesProcessed = 0, bytesProcessed = 0, bytesSaved = 0 }: Usag
   const percentage = bytesProcessed === 0 ? 0 : Math.round(bytesSaved / bytesProcessed * 100)
 
   return (
-    <Stack gap="xs" align="center" my="xl">
+    <Stack gap={0} align="center" my={4}>
       <Group gap={4} align="baseline">
-        <Text style={{ fontSize: rem(48), fontWeight: 700, color: '#2b69e3', lineHeight: 1 }}>
+        <Text style={{ fontSize: rem(32), fontWeight: 700, color: '#2b69e3', lineHeight: 1 }}>
           {percentage}%
         </Text>
-        <Text size="sm" c="dimmed" fw={500}>
+        <Text size="xs" c="dimmed" fw={500} style={{ fontSize: rem(10) }}>
           saved
         </Text>
       </Group>
 
-      <Group gap="xl" justify="center" style={{ width: '100%' }}>
+      <Group gap="md" justify="center" style={{ width: '100%' }} mt={2}>
         <Stack gap={0} align="center" style={{ flex: 1 }}>
-          <Text fw={700} size="md">
+          <Text fw={700} size="sm">
             {formatBytes(bytesSaved)}
           </Text>
-          <Text size="xs" c="dimmed" fw={700}>
+          <Text c="dimmed" fw={700} style={{ fontSize: rem(9) }}>
             DATA
           </Text>
         </Stack>
         
-        <Divider orientation="vertical" h={40} />
+        <Divider orientation="vertical" h={24} />
 
         <Stack gap={0} align="center" style={{ flex: 1 }}>
-          <Text fw={700} size="md">
+          <Text fw={700} size="sm">
             {filesProcessed.toLocaleString()}
           </Text>
-          <Text size="xs" c="dimmed" fw={700}>
+          <Text c="dimmed" fw={700} style={{ fontSize: rem(9) }}>
             IMAGES
           </Text>
         </Stack>

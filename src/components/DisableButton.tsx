@@ -22,7 +22,7 @@ export default ({ disabledHosts, currentUrl, onSiteDisable, onSiteEnable }: Disa
       color={isDisabled ? "green" : "red"}
       fullWidth
       radius="xs"
-      h={44}
+      h={32}
       styles={(theme) => ({
         root: {
           backgroundColor: isDisabled ? '#e6fffa' : '#fff5f5',
@@ -34,7 +34,7 @@ export default ({ disabledHosts, currentUrl, onSiteDisable, onSiteEnable }: Disa
         },
         label: {
           fontWeight: 700,
-          fontSize: '16px'
+          fontSize: '14px'
         }
       })}
     >
