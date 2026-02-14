@@ -29,10 +29,18 @@ export default ({
         <Slider
           value={compressionLevel}
           onChange={onCompressionLevelChange}
-          min={10}
-          max={90}
-          step={5}
+          min={1}
+          max={100}
+          step={1}
           label={null}
+          marks={[
+            { value: 0, label: '0%' },
+            { value: 20, label: '20%' },
+            { value: 40, label: '40%' },
+            { value: 60, label: '60%' },
+            { value: 80, label: '80%' },
+            { value: 100, label: '100%' },
+          ]}
           styles={{
             thumb: {
               borderWidth: rem(2),
@@ -41,6 +49,10 @@ export default ({
             },
             track: {
               height: rem(6),
+            },
+            markLabel: {
+              fontSize: rem(10),
+              marginTop: rem(5),
             }
           }}
         />
