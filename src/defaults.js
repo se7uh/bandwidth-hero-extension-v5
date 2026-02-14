@@ -10,4 +10,5 @@ export default {
   compressionLevel: 40,
   proxyUrl: '',
   isWebpSupported: true,
+  colorScheme: 'light',
 }
