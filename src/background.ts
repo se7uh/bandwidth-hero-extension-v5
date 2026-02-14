@@ -9,6 +9,21 @@ import updateRedirectRules from './background/updateRedirectRules'
 
 const STORAGE_KEY_STATS = 'statistics'
 
+async function incrementStats(bytesProcessed: number, bytesSaved: number) {
+  const stored = await chrome.storage.local.get(STORAGE_KEY_STATS)
+  const statistics = stored[STORAGE_KEY_STATS] || {
+    filesProcessed: 0,
+    bytesProcessed: 0,
+    bytesSaved: 0
+  }
+
+  statistics.filesProcessed += 1
+  statistics.bytesProcessed += bytesProcessed
+  statistics.bytesSaved += bytesSaved
+
+  await chrome.storage.local.set({ [STORAGE_KEY_STATS]: statistics })
+}
+
 async function updateIcon(isEnabled: boolean) {
   // Using same icon for both states - extension.js handles icon paths
   // You can add badge text or different color treatment instead
@@ -81,6 +96,13 @@ async function handleCompressImage(
     const response = await fetch(proxyUrl)
     if (!response.ok) {
       throw new Error(`Proxy returned ${response.status} ${response.statusText}`)
+    }
+
+    const originalSize = parseInt(response.headers.get('x-original-size') || '0')
+    const bytesSaved = parseInt(response.headers.get('x-bytes-saved') || '0')
+
+    if (originalSize > 0) {
+      await incrementStats(originalSize, bytesSaved)
     }
 
     const blob = await response.blob()
