@@ -1,7 +1,12 @@
 import React from 'react'
 import { Group, Box, Switch, ActionIcon, useMantineColorScheme } from '@mantine/core'
 
-export default ({ enabled, onChange }) => {
+interface HeaderProps {
+  enabled: boolean
+  onChange: () => void
+}
+
+export default ({ enabled, onChange }: HeaderProps) => {
   const { colorScheme, toggleColorScheme } = useMantineColorScheme()
   
   return (
