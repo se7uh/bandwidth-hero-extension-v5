@@ -72,14 +72,6 @@
     }
   ],
   "web_accessible_resources": [
-    {
-      "resources": [
-        "setup/index.html"
-      ],
-      "matches": [
-        "<all_urls>"
-      ]
-    }
   ],
   "author": "Anatoliy Yastreb"
 }

@@ -3,7 +3,8 @@ import UsageStatistics from './UsageStatistics'
 import DisableButton from './DisableButton'
 import CompressionSettings from './CompressionSettings'
 import ManageDisabled from './ManageDisabled'
-import { Stack, Divider } from '@mantine/core'
+import { Stack, Divider, Alert } from '@mantine/core'
+import { IconInfoCircle } from '@tabler/icons-react'
 
 interface HomeProps {
   view?: 'home' | 'sites'
@@ -16,6 +17,7 @@ interface HomeProps {
   currentUrl: string
   compressionLevel: number
   convertBw: boolean
+  proxyUrl?: string
   onSiteDisable: () => void
   onSiteEnable: () => void
   disabledOnChange?: (value: string) => void
@@ -31,6 +33,7 @@ export default ({
   currentUrl,
   compressionLevel,
   convertBw,
+  proxyUrl,
   onSiteDisable,
   onSiteEnable,
   disabledOnChange,
@@ -49,13 +52,28 @@ export default ({
 
   return (
     <Stack gap="xs">
+      {!proxyUrl && (
+        <Alert 
+          color="orange" 
+          variant="light" 
+          title="Setup Required"
+          icon={<IconInfoCircle size={16} />}
+          styles={{
+            root: { padding: '8px' },
+            title: { fontSize: '12px', marginBottom: '-10px' },
+            message: { fontSize: '11px' }
+          }}
+        >
+          Please configure your compression proxy URL to start saving data.
+        </Alert>
+      )}
       <UsageStatistics
         filesProcessed={statistics.filesProcessed}
         bytesProcessed={statistics.bytesProcessed}
         bytesSaved={statistics.bytesSaved}
       />
       
-      <Divider my="xs" />
+      <Divider my={4} />
 
       <DisableButton
         disabledHosts={disabledHosts}
