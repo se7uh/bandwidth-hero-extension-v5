@@ -1,11 +1,12 @@
 import React from 'react'
 import { createRoot } from 'react-dom/client'
-import { HashRouter as Router, Route } from 'react-router-dom'
-import { MantineProvider } from '@mantine/core'
+import { HashRouter as Router, Route, Switch as RouterSwitch, withRouter, RouteComponentProps } from 'react-router-dom'
+import { MantineProvider, Tabs, Box, rem } from '@mantine/core'
+import { IconHome, IconWorld } from '@tabler/icons-react'
 import '@mantine/core/styles.css'
 import Header from '../components/Header'
 import Home from '../components/Home'
-import Footer from '../components/Footer'
+import Settings from '../components/Settings'
 import parseUrl from '../utils/parseUrl'
 import defaults from '../defaults'
 
@@ -24,7 +25,7 @@ interface PopupState {
   colorScheme: 'light' | 'dark'
 }
 
-interface PopupProps {
+interface PopupProps extends RouteComponentProps {
   currentUrl: string
 }
 
@@ -94,9 +95,8 @@ class Popup extends React.Component<PopupProps, PopupState> {
     })
   }
 
-  disabledHostsWasChanged = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const value: string = event.target.value;
-    const disabledHosts = value.split('\n').filter(host => host.trim() !== '');
+  disabledHostsWasChanged = (value: string) => {
+    const disabledHosts = value.split('\n').map(h => h.trim()).filter(host => host !== '');
     chrome.storage.local.set({ disabledHosts });
     this.setState({ disabledHosts });
   }
@@ -109,16 +109,16 @@ class Popup extends React.Component<PopupProps, PopupState> {
     })
   }
 
-  compressionLevelWasChanged = (_: any, { value }: { value: number }) => {
+  compressionLevelWasChanged = (value: number) => {
     this.setState(() => {
       chrome.storage.local.set({ compressionLevel: value })
       return { compressionLevel: value }
     })
   }
 
-  handleColorSchemeChange = (newColorScheme: 'light' | 'dark') => {
-    chrome.storage.local.set({ colorScheme: newColorScheme })
-    this.setState({ colorScheme: newColorScheme })
+  proxyUrlWasChanged = (proxyUrl: string) => {
+    chrome.storage.local.set({ proxyUrl })
+    this.setState({ proxyUrl })
   }
 
   stateWasUpdatedFromBackground = (changes: { [key: string]: chrome.storage.StorageChange }) => {
@@ -131,49 +131,140 @@ class Popup extends React.Component<PopupProps, PopupState> {
   }
 
   render() {
+    const { history, location } = this.props;
+    const isHome = location.pathname === '/';
+    const isSites = location.pathname === '/sites';
+    const isSettings = location.pathname === '/settings';
+
     return (
-      <MantineProvider 
-        defaultColorScheme={this.state.colorScheme}
-        theme={{
-          colors: {
-            brand: ['#e7f5ff', '#d0ebff', '#a5d8ff', '#74c0fc', '#4dabf7', '#339af0', '#228be6', '#1c7ed6', '#1971c2', '#1864ab'],
-          },
-          primaryColor: 'brand',
-        }}
-      >
-        <Router>
-          <div style={{ width: '380px' }}>
-            <Header 
-              enabled={this.state.enabled} 
-              onChange={this.enableSwitchWasChanged}
-              onColorSchemeChange={this.handleColorSchemeChange}
-            />
-            <Route
-              exact
-              path="/"
-              render={() => (
-                <Home
-                  statistics={this.state.statistics}
-                  disabledHosts={this.state.disabledHosts}
-                  currentUrl={this.props.currentUrl}
-                  compressionLevel={this.state.compressionLevel}
-                  convertBw={this.state.convertBw}
-                  onSiteDisable={this.siteWasDisabled}
-                  onSiteEnable={this.siteWasEnabled}
-                  disabledOnChange={this.disabledHostsWasChanged}
-                  convertBwOnChange={this.convertBwWasChanged}
-                  isWebpSupported={this.state.isWebpSupported}
-                  compressionLevelOnChange={this.compressionLevelWasChanged}
-                />
-              )}
-            />
-            <Footer />
-          </div>
-        </Router>
+      <MantineProvider forceColorScheme="light" theme={{ primaryColor: 'blue' }}>
+        <Box style={{ width: '400px', minHeight: '550px', backgroundColor: 'white', display: 'flex', flexDirection: 'column' }}>
+          <RouterSwitch>
+            <Route path="/settings">
+              <Settings 
+                proxyUrl={this.state.proxyUrl} 
+                onChange={this.proxyUrlWasChanged}
+                onBack={() => history.push('/')}
+              />
+            </Route>
+            <Route path="*">
+              <Box style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                <Box bg="#2b69e3" pt="md">
+                                                  <Header 
+                                                    enabled={this.state.enabled} 
+                                                    onChange={this.enableSwitchWasChanged}
+                                                    pt="lg"
+                                                  />
+                                                  <Tabs 
+                                                    value={isSites ? 'sites' : 'home'} 
+                                                    onChange={(val) => history.push(val === 'home' ? '/' : '/sites')}
+                                                    variant="unstyled"
+                                                    styles={{
+                                                      root: { display: 'flex', flexDirection: 'column' },
+                                                      list: {
+                                                        display: 'flex',
+                                                        padding: '0 12px',
+                                                        backgroundColor: '#2b69e3',
+                                                        borderBottom: 0,
+                                                        gap: '8px',
+                                                        marginTop: '10px',
+                                                      }
+                                                    }}
+                                                  >
+                                  
+                    <Tabs.List grow>
+                      <Tabs.Tab 
+                        value="home" 
+                        leftSection={<IconHome size={18} />}
+                        style={{
+                          flex: 1,
+                          backgroundColor: !isSites ? 'white' : 'rgba(0, 0, 0, 0.2)',
+                          color: !isSites ? '#2b69e3' : 'white',
+                          padding: '12px 24px',
+                          fontWeight: 700,
+                          fontSize: '14px',
+                          borderRadius: '8px 8px 0 0',
+                          border: 0,
+                          cursor: 'pointer',
+                          display: 'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          gap: '8px',
+                          marginBottom: '-1px',
+                        }}
+                      >
+                        Home
+                      </Tabs.Tab>
+                      <Tabs.Tab 
+                        value="sites" 
+                        leftSection={<IconWorld size={18} />}
+                        style={{
+                          flex: 1,
+                          backgroundColor: isSites ? 'white' : 'rgba(0, 0, 0, 0.2)',
+                          color: isSites ? '#2b69e3' : 'white',
+                          padding: '12px 24px',
+                          fontWeight: 700,
+                          fontSize: '14px',
+                          borderRadius: '8px 8px 0 0',
+                          border: 0,
+                          cursor: 'pointer',
+                          display: 'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          gap: '8px',
+                          marginBottom: '-1px',
+                        }}
+                      >
+                        Sites
+                      </Tabs.Tab>
+                    </Tabs.List>
+                  </Tabs>
+                </Box>
+
+                <Box bg="white" p="md" style={{ flex: 1 }}>
+                  <RouterSwitch>
+                    <Route exact path="/">
+                      <Home
+                        statistics={this.state.statistics}
+                        disabledHosts={this.state.disabledHosts}
+                        currentUrl={this.props.currentUrl}
+                        compressionLevel={this.state.compressionLevel}
+                        convertBw={this.state.convertBw}
+                        onSiteDisable={this.siteWasDisabled}
+                        onSiteEnable={this.siteWasEnabled}
+                        compressionLevelOnChange={this.compressionLevelWasChanged}
+                        convertBwOnChange={this.convertBwWasChanged}
+                        onConfigureProxy={() => history.push('/settings')}
+                      />
+                    </Route>
+                    <Route path="/sites">
+                      <Home
+                        view="sites"
+                        statistics={this.state.statistics}
+                        disabledHosts={this.state.disabledHosts}
+                        currentUrl={this.props.currentUrl}
+                        compressionLevel={this.state.compressionLevel}
+                        convertBw={this.state.convertBw}
+                        onSiteDisable={this.siteWasDisabled}
+                        onSiteEnable={this.siteWasEnabled}
+                        disabledOnChange={this.disabledHostsWasChanged}
+                        compressionLevelOnChange={this.compressionLevelWasChanged}
+                        convertBwOnChange={this.convertBwWasChanged}
+                        onConfigureProxy={() => history.push('/settings')}
+                      />
+                    </Route>
+                  </RouterSwitch>
+                </Box>
+              </Box>
+            </Route>
+          </RouterSwitch>
+        </Box>
       </MantineProvider>
     )
   }
 }
+
+const PopupWithRouter = withRouter(Popup);
 
 chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
   const currentUrl = tabs[0]?.url || ''
@@ -181,6 +272,10 @@ chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
   const container = document.getElementById('root')
   if (container) {
     const root = createRoot(container)
-    root.render(<Popup currentUrl={currentUrl} />)
+    root.render(
+      <Router>
+        <PopupWithRouter currentUrl={currentUrl} />
+      </Router>
+    )
   }
 })
