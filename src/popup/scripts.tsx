@@ -222,34 +222,38 @@ class Popup extends React.Component<PopupProps, PopupState> {
                 <Box bg="white" p="xs" style={{ flex: 1 }}>
                   <RouterSwitch>
                     <Route exact path="/">
-                      <Home
-                        statistics={this.state.statistics}
-                        disabledHosts={this.state.disabledHosts}
-                        currentUrl={this.props.currentUrl}
-                        compressionLevel={this.state.compressionLevel}
-                        convertBw={this.state.convertBw}
-                        onSiteDisable={this.siteWasDisabled}
-                        onSiteEnable={this.siteWasEnabled}
-                        compressionLevelOnChange={this.compressionLevelWasChanged}
-                        convertBwOnChange={this.convertBwWasChanged}
-                        onConfigureProxy={() => history.push('/settings')}
-                      />
+                                          <Home
+                                            statistics={this.state.statistics}
+                                            disabledHosts={this.state.disabledHosts}
+                                            currentUrl={this.props.currentUrl}
+                                            compressionLevel={this.state.compressionLevel}
+                                            convertBw={this.state.convertBw}
+                                            proxyUrl={this.state.proxyUrl}
+                                            onSiteDisable={this.siteWasDisabled}
+                                            onSiteEnable={this.siteWasEnabled}
+                                            compressionLevelOnChange={this.compressionLevelWasChanged}
+                                            convertBwOnChange={this.convertBwWasChanged}
+                                            onConfigureProxy={() => history.push('/settings')}
+                                          />
+                      
                     </Route>
                     <Route path="/sites">
-                      <Home
-                        view="sites"
-                        statistics={this.state.statistics}
-                        disabledHosts={this.state.disabledHosts}
-                        currentUrl={this.props.currentUrl}
-                        compressionLevel={this.state.compressionLevel}
-                        convertBw={this.state.convertBw}
-                        onSiteDisable={this.siteWasDisabled}
-                        onSiteEnable={this.siteWasEnabled}
-                        disabledOnChange={this.disabledHostsWasChanged}
-                        compressionLevelOnChange={this.compressionLevelWasChanged}
-                        convertBwOnChange={this.convertBwWasChanged}
-                        onConfigureProxy={() => history.push('/settings')}
-                      />
+                                          <Home
+                                            view="sites"
+                                            statistics={this.state.statistics}
+                                            disabledHosts={this.state.disabledHosts}
+                                            currentUrl={this.props.currentUrl}
+                                            compressionLevel={this.state.compressionLevel}
+                                            convertBw={this.state.convertBw}
+                                            proxyUrl={this.state.proxyUrl}
+                                            onSiteDisable={this.siteWasDisabled}
+                                            onSiteEnable={this.siteWasEnabled}
+                                            disabledOnChange={this.disabledHostsWasChanged}
+                                            compressionLevelOnChange={this.compressionLevelWasChanged}
+                                            convertBwOnChange={this.convertBwWasChanged}
+                                            onConfigureProxy={() => history.push('/settings')}
+                                          />
+                      
                     </Route>
                   </RouterSwitch>
                 </Box>
