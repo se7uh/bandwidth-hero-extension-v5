@@ -1,13 +1,30 @@
 import React from 'react'
 import { createRoot } from 'react-dom/client'
 import { HashRouter as Router, Route } from 'react-router-dom'
-import { MantineProvider } from '@mantine/core'
+import { MantineProvider, useMantineColorScheme, ActionIcon } from '@mantine/core'
 import '@mantine/core/styles.css'
 import Header from '../components/Header.js'
 import Home from '../components/Home.js'
 import Footer from '../components/Footer.js'
 import parseUrl from '../utils/parseUrl.js'
 import defaults from '../defaults.js'
+
+// Color scheme toggle component
+function ColorSchemeToggle() {
+  const { colorScheme, toggleColorScheme } = useMantineColorScheme()
+  
+  return (
+    <ActionIcon 
+      onClick={() => toggleColorScheme()} 
+      variant="default" 
+      size="md"
+      style={{ marginLeft: '10px' }}
+      title={colorScheme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+    >
+      {colorScheme === 'dark' ? '☀️' : '🌙'}
+    </ActionIcon>
+  )
+}
 
 class Popup extends React.Component {
   constructor(props) {
@@ -23,7 +40,8 @@ class Popup extends React.Component {
       convertBw: false,
       compressionLevel: 40,
       isWebpSupported: true,
-      proxyUrl: ''
+      proxyUrl: '',
+      colorScheme: 'light'
     }
   }
 
@@ -36,7 +54,8 @@ class Popup extends React.Component {
         convertBw: stored.convertBw ?? defaults.convertBw,
         compressionLevel: stored.compressionLevel ?? defaults.compressionLevel,
         isWebpSupported: stored.isWebpSupported ?? true,
-        proxyUrl: stored.proxyUrl ?? defaults.proxyUrl
+        proxyUrl: stored.proxyUrl ?? defaults.proxyUrl,
+        colorScheme: stored.colorScheme ?? 'light'
       })
     })
 
@@ -96,6 +115,11 @@ class Popup extends React.Component {
     })
   }
 
+  handleColorSchemeChange = (newColorScheme) => {
+    chrome.storage.local.set({ colorScheme: newColorScheme })
+    this.setState({ colorScheme: newColorScheme })
+  }
+
   stateWasUpdatedFromBackground = (changes) => {
     const changedItems = Object.keys(changes)
     for (const item of changedItems) {
@@ -107,10 +131,22 @@ class Popup extends React.Component {
 
   render() {
     return (
-      <MantineProvider>
+      <MantineProvider 
+        defaultColorScheme={this.state.colorScheme}
+        theme={{
+          colors: {
+            brand: ['#e7f5ff', '#d0ebff', '#a5d8ff', '#74c0fc', '#4dabf7', '#339af0', '#228be6', '#1c7ed6', '#1971c2', '#1864ab'],
+          },
+          primaryColor: 'brand',
+        }}
+      >
         <Router>
           <div style={{ width: '380px' }}>
-            <Header enabled={this.state.enabled} onChange={this.enableSwitchWasChanged} />
+            <Header 
+              enabled={this.state.enabled} 
+              onChange={this.enableSwitchWasChanged}
+              onColorSchemeChange={this.handleColorSchemeChange}
+            />
             <Route
               exact
               path="/"
