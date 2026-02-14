@@ -1,7 +1,7 @@
 import React from 'react'
 import { createRoot } from 'react-dom/client'
 import { HashRouter as Router, Route, Switch as RouterSwitch, withRouter, RouteComponentProps } from 'react-router-dom'
-import { MantineProvider, Tabs, Box } from '@mantine/core'
+import { MantineProvider, Tabs, Box, Group } from '@mantine/core'
 import { IconHome, IconWorld } from '@tabler/icons-react'
 import '@mantine/core/styles.css'
 import Header from '../components/Header'
@@ -173,7 +173,6 @@ class Popup extends React.Component<PopupProps, PopupState> {
                     <Tabs.List grow>
                       <Tabs.Tab 
                         value="home" 
-                        leftSection={<IconHome size={18} />}
                         style={{
                           flex: 1,
                           backgroundColor: !isSites ? 'white' : 'rgba(0, 0, 0, 0.2)',
@@ -187,15 +186,16 @@ class Popup extends React.Component<PopupProps, PopupState> {
                           display: 'flex',
                           justifyContent: 'center',
                           alignItems: 'center',
-                          gap: '8px',
                           marginBottom: '-1px',
                         }}
                       >
-                        Home
+                        <Group gap={4} align="center" justify="center" style={{ height: '100%' }}>
+                          <IconHome size={18} style={{ display: 'block' }} />
+                          <span style={{ lineHeight: 1 }}>Home</span>
+                        </Group>
                       </Tabs.Tab>
                       <Tabs.Tab 
                         value="sites" 
-                        leftSection={<IconWorld size={18} />}
                         style={{
                           flex: 1,
                           backgroundColor: isSites ? 'white' : 'rgba(0, 0, 0, 0.2)',
@@ -209,11 +209,13 @@ class Popup extends React.Component<PopupProps, PopupState> {
                           display: 'flex',
                           justifyContent: 'center',
                           alignItems: 'center',
-                          gap: '8px',
                           marginBottom: '-1px',
                         }}
                       >
-                        Sites
+                        <Group gap={4} align="center" justify="center" style={{ height: '100%' }}>
+                          <IconWorld size={18} style={{ display: 'block' }} />
+                          <span style={{ lineHeight: 1 }}>Sites</span>
+                        </Group>
                       </Tabs.Tab>
                     </Tabs.List>
                   </Tabs>
@@ -222,38 +224,36 @@ class Popup extends React.Component<PopupProps, PopupState> {
                 <Box bg="white" p="xs" style={{ flex: 1 }}>
                   <RouterSwitch>
                     <Route exact path="/">
-                                          <Home
-                                            statistics={this.state.statistics}
-                                            disabledHosts={this.state.disabledHosts}
-                                            currentUrl={this.props.currentUrl}
-                                            compressionLevel={this.state.compressionLevel}
-                                            convertBw={this.state.convertBw}
-                                            proxyUrl={this.state.proxyUrl}
-                                            onSiteDisable={this.siteWasDisabled}
-                                            onSiteEnable={this.siteWasEnabled}
-                                            compressionLevelOnChange={this.compressionLevelWasChanged}
-                                            convertBwOnChange={this.convertBwWasChanged}
-                                            onConfigureProxy={() => history.push('/settings')}
-                                          />
-                      
+                      <Home
+                        statistics={this.state.statistics}
+                        disabledHosts={this.state.disabledHosts}
+                        currentUrl={this.props.currentUrl}
+                        compressionLevel={this.state.compressionLevel}
+                        convertBw={this.state.convertBw}
+                        proxyUrl={this.state.proxyUrl}
+                        onSiteDisable={this.siteWasDisabled}
+                        onSiteEnable={this.siteWasEnabled}
+                        compressionLevelOnChange={this.compressionLevelWasChanged}
+                        convertBwOnChange={this.convertBwWasChanged}
+                        onConfigureProxy={() => history.push('/settings')}
+                      />
                     </Route>
                     <Route path="/sites">
-                                          <Home
-                                            view="sites"
-                                            statistics={this.state.statistics}
-                                            disabledHosts={this.state.disabledHosts}
-                                            currentUrl={this.props.currentUrl}
-                                            compressionLevel={this.state.compressionLevel}
-                                            convertBw={this.state.convertBw}
-                                            proxyUrl={this.state.proxyUrl}
-                                            onSiteDisable={this.siteWasDisabled}
-                                            onSiteEnable={this.siteWasEnabled}
-                                            disabledOnChange={this.disabledHostsWasChanged}
-                                            compressionLevelOnChange={this.compressionLevelWasChanged}
-                                            convertBwOnChange={this.convertBwWasChanged}
-                                            onConfigureProxy={() => history.push('/settings')}
-                                          />
-                      
+                      <Home
+                        view="sites"
+                        statistics={this.state.statistics}
+                        disabledHosts={this.state.disabledHosts}
+                        currentUrl={this.props.currentUrl}
+                        compressionLevel={this.state.compressionLevel}
+                        convertBw={this.state.convertBw}
+                        proxyUrl={this.state.proxyUrl}
+                        onSiteDisable={this.siteWasDisabled}
+                        onSiteEnable={this.siteWasEnabled}
+                        disabledOnChange={this.disabledHostsWasChanged}
+                        compressionLevelOnChange={this.compressionLevelWasChanged}
+                        convertBwOnChange={this.convertBwWasChanged}
+                        onConfigureProxy={() => history.push('/settings')}
+                      />
                     </Route>
                   </RouterSwitch>
                 </Box>
