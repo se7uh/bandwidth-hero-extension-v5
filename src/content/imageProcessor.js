@@ -5,13 +5,18 @@
   const processedImages = new WeakSet();
   const pendingImages = new Map();
   
-  // Check if URL should be processed (not data/blob/relative)
+  // File extensions to skip (small files that don't need compression)
+  const SKIP_EXTENSIONS = /\.(ico|svg|svgz)(\?.*)?$/i;
+  
+  // Check if URL should be processed (not data/blob/relative/small-files)
   function isValidImageUrl(url) {
     if (!url) return false;
     if (url.startsWith('data:')) return false;
     if (url.startsWith('blob:')) return false;
     if (url.startsWith('javascript:')) return false;
     if (url.includes('bh-allow=1')) return false;
+    // Skip small file types (ico, svg) - compression not worth it
+    if (SKIP_EXTENSIONS.test(url)) return false;
     return url.startsWith('http://') || url.startsWith('https://');
   }
   
