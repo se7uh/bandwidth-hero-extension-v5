@@ -1,20 +1,63 @@
 {
-  "manifest_version": 3,
+  "$schema": "https://json.schemastore.org/chrome-manifest.json",
+  "chromium:manifest_version": 3,
+  "firefox:manifest_version": 2,
+  "version": "3.0.0",
   "name": "Bandwidth Hero - Live Image Compression",
   "short_name": "Bandwidth Hero",
   "description": "Saves data by compressing images on the page.",
-  "version": "3.0.0",
   "icons": {
-    "64": "assets/icon-128.png",
-    "128": "assets/icon-256.png"
+    "16": "images/icon.png",
+    "32": "images/icon.png",
+    "48": "images/icon.png",
+    "64": "images/icon.png",
+    "128": "images/icon-256.png"
   },
-  "action": {
-    "default_icon": "assets/icon-128.png",
+  "chromium:action": {
+    "default_icon": {
+      "16": "images/icon.png",
+      "32": "images/icon.png",
+      "48": "images/icon.png",
+      "64": "images/icon.png",
+      "128": "images/icon-256.png"
+    },
     "default_title": "Bandwidth Hero",
-    "default_popup": "popup.html"
+    "default_popup": "popup/index.html"
   },
+  "firefox:browser_action": {
+    "default_icon": {
+      "16": "images/icon.png",
+      "32": "images/icon.png",
+      "48": "images/icon.png",
+      "64": "images/icon.png",
+      "128": "images/icon-256.png"
+    },
+    "default_title": "Bandwidth Hero",
+    "default_popup": "popup/index.html"
+  },
+  "chromium:permissions": [
+    "activeTab",
+    "tabs",
+    "storage",
+    "declarativeNetRequest",
+    "declarativeNetRequestWithHostAccess"
+  ],
+  "firefox:permissions": [
+    "activeTab",
+    "tabs",
+    "storage",
+    "webRequest",
+    "webRequestBlocking",
+    "<all_urls>"
+  ],
+  "chromium:host_permissions": [
+    "<all_urls>"
+  ],
   "background": {
-    "service_worker": "background.bundle.js"
+    "chromium:service_worker": "background.ts",
+    "firefox:scripts": [
+      "background.ts"
+    ]
   },
   "content_scripts": [
     {
@@ -22,23 +65,21 @@
         "<all_urls>"
       ],
       "js": [
-        "content.bundle.js"
+        "content/scripts.ts"
       ],
       "all_frames": true,
       "run_at": "document_start"
     }
   ],
-  "permissions": [
-    "activeTab",
-    "tabs",
-    "storage",
-    "declarativeNetRequest",
-    "declarativeNetRequestWithHostAccess"
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "setup/index.html"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
   ],
-  "host_permissions": [
-    "<all_urls>"
-  ],
-  "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self'"
-  }
+  "author": "Anatoliy Yastreb"
 }

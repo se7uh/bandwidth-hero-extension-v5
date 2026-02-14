@@ -1,7 +1,7 @@
 import React from 'react'
-import UsageStatistic from './UsageStatistic'
-import DisableButton from './DisableButton'
-import SettingsAccordion from './SettingsAccordion'
+import UsageStatistic from './UsageStatistic.js'
+import DisableButton from './DisableButton.js'
+import SettingsAccordion from './SettingsAccordion.js'
 
 export default ({
   statistics,
