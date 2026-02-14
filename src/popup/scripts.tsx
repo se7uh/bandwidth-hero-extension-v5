@@ -94,12 +94,11 @@ class Popup extends React.Component<PopupProps, PopupState> {
     })
   }
 
-  disabledHostsWasChanged = (_: any, { value }: { value: string }) => {
-    this.setState(() => {
-      const disabledHosts = value.split('\n')
-      chrome.storage.local.set({ disabledHosts })
-      return { disabledHosts }
-    })
+  disabledHostsWasChanged = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value: string = event.target.value;
+    const disabledHosts = value.split('\n').filter(host => host.trim() !== '');
+    chrome.storage.local.set({ disabledHosts });
+    this.setState({ disabledHosts });
   }
 
   convertBwWasChanged = () => {

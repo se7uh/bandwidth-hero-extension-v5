@@ -3,8 +3,16 @@ import { Stack, Checkbox, Select, Button } from '@mantine/core'
 import { IconSettings } from '@tabler/icons-react'
 import defaults from '../defaults.js'
 
-export default ({ convertBw, compressionLevel, onConvertBwChange, onCompressionLevelChange, isWebpSupported }) => {
-  const compressionToText = (description, value) => {
+interface CompressionSettingsProps {
+  convertBw: boolean
+  compressionLevel: number
+  onConvertBwChange: () => void
+  onCompressionLevelChange: (event: any, data: { value: number }) => void
+  isWebpSupported: boolean
+}
+
+export default ({ convertBw, compressionLevel, onConvertBwChange, onCompressionLevelChange, isWebpSupported }: CompressionSettingsProps) => {
+  const compressionToText = (description: string, value: number) => {
     const extension = isWebpSupported ? 'WEBP' : 'JPG';
     return `${description} compression (${extension} ${value})`;
   };
@@ -27,7 +35,7 @@ export default ({ convertBw, compressionLevel, onConvertBwChange, onCompressionL
         <Select
           data={compressionLevelOptions}
           value={String(compressionLevel)}
-          onChange={(value) => onCompressionLevelChange(null, { value: parseInt(value) })}
+          onChange={(value) => onCompressionLevelChange(null, { value: parseInt(value!) })}
         />
       </div>
       <div>

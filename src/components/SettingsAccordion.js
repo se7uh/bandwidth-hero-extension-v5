@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Paper, Accordion } from '@mantine/core'
-import ManageDisabled from './ManageDisabled.js'
-import CompressionSettings from './CompressionSettings.js'
+import ManageDisabled from './ManageDisabled.tsx'
+import CompressionSettings from './CompressionSettings.tsx'
 
 export default ({
   disabledHosts,
