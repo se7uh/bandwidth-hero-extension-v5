@@ -217,5 +217,14 @@ function init() {
   }
 }
 
-// Export for TypeScript
-export {}
+// Default export for Extension.js hot reload
+export default function main() {
+  // Initialization happens via storage listeners above
+  // Return cleanup function
+  return () => {
+    if (observer) {
+      observer.disconnect()
+      observer = null
+    }
+  }
+}
