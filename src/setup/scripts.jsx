@@ -1,21 +1,24 @@
 import React from 'react'
+import { createRoot } from 'react-dom/client'
 import debounce from 'lodash/debounce'
 import {
   Segment,
-  Divider,
   Message,
   Icon,
   Input,
   Accordion
 } from 'semantic-ui-react'
-import Header from '../components/Header'
+import 'semantic-ui-css/semantic.min.css'
+import '../index.css'
+import Header from '../components/Header.js'
 import axios from 'axios'
+import defaults from '../defaults.js'
 
-export default class Setup extends React.Component {
+class Setup extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      proxyUrl: props.proxyUrl,
+      proxyUrl: props.proxyUrl || '',
       isLoading: false,
       isValid: true
     }
@@ -59,7 +62,7 @@ export default class Setup extends React.Component {
   render() {
     return (
       <Segment className="wrapper">
-        <Header />
+        <Header enabled={true} />
         <Segment basic attached>
           <Message icon warning>
             <Icon name="power cord" />
@@ -144,10 +147,10 @@ export default class Setup extends React.Component {
                   width="580"
                   height="335"
                   src="https://www.youtube.com/embed/y3tkYEXAics"
-                  frameborder="0"
+                  frameBorder="0"
                   gesture="media"
                   allow="encrypted-media"
-                  allowfullscreen
+                  allowFullScreen
                 />
               </p>
             </Accordion.Content>
@@ -184,3 +187,14 @@ function isValidURL(str) {
   a.href = str
   return a.host && a.host != window.location.host
 }
+
+// Initialize setup page
+chrome.storage.local.get((storedState) => {
+  const initialState = { ...defaults, ...storedState }
+
+  const container = document.getElementById('root')
+  if (container) {
+    const root = createRoot(container)
+    root.render(<Setup {...initialState} />)
+  }
+})

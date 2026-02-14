@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Segment, Accordion, Icon } from 'semantic-ui-react'
-import ManageDisabled from './ManageDisabled'
-import CompressionSettings from './CompressionSettings'
+import ManageDisabled from './ManageDisabled.js'
+import CompressionSettings from './CompressionSettings.js'
 
 export default ({
   disabledHosts,

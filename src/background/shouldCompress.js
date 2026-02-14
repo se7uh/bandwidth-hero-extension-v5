@@ -1,6 +1,6 @@
 import isImage from 'is-image';
-import isPrivateNetwork from './isPrivateNetwork';
-import parseUrl from '../utils/parseUrl';
+import isPrivateNetwork from './isPrivateNetwork.js';
+import parseUrl from '../utils/parseUrl.js';
 
 export default ({ imageUrl, pageUrl, compressed, proxyUrl, disabledHosts, enabled, type = 'image' }) => {
   imageUrl = imageUrl.replace('#bh-no-compress=1', '').replace(/[\?&]bh-allow=1/, '');

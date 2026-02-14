@@ -32,12 +32,12 @@ export default ({ convertBw, compressionLevel, onConvertBwChange, onCompressionL
         />
       </div>
       <div style={{ marginTop: '1em' }}>
-        <Button
+          <Button
           basic
           fluid
           content="Configure data compression service"
           icon="setting"
-          onClick={() => chrome.tabs.create({ url: 'setup.html' })}
+          onClick={() => chrome.tabs.create({ url: chrome.runtime.getURL('setup/index.html') })}
         />
       </div>
     </div>
