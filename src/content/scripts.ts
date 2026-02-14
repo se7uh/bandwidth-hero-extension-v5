@@ -1,3 +1,31 @@
+// Check extension state before processing
+let isEnabled = true
+let observer: MutationObserver | null = null
+
+// Load initial state
+chrome.storage.local.get(['enabled'], (result) => {
+  isEnabled = (result as any).enabled !== false // default to true
+  if (isEnabled) {
+    init()
+  }
+})
+
+// Listen for state changes
+chrome.storage.onChanged.addListener((changes) => {
+  if (changes.enabled) {
+    isEnabled = (changes.enabled.newValue as boolean) ?? true
+    if (isEnabled) {
+      init()
+    } else {
+      // Stop processing when disabled
+      if (observer) {
+        observer.disconnect()
+        observer = null
+      }
+    }
+  }
+})
+
 // Early image interception to prevent race condition with DNR
 const processedImages = new WeakSet<HTMLImageElement>()
 const pendingImages = new Map<HTMLImageElement, {
@@ -31,6 +59,8 @@ interface CompressImageResponse {
 
 // Intercept a single image
 function interceptImage(img: HTMLImageElement) {
+  if (!isEnabled) return
+  
   if (processedImages.has(img) || pendingImages.has(img)) {
     return
   }
@@ -123,13 +153,17 @@ function loadOriginal(img: HTMLImageElement, originalSrc: string, reason = 'unkn
 
 // Process all existing images in the document
 function processExistingImages() {
+  if (!isEnabled) return
+  
   const images = document.querySelectorAll<HTMLImageElement>('img[src]')
   images.forEach(interceptImage)
 }
 
 // Setup mutation observer for dynamically added images
 function setupMutationObserver() {
-  const observer = new MutationObserver((mutations) => {
+  observer = new MutationObserver((mutations) => {
+    if (!isEnabled) return
+    
     mutations.forEach((mutation) => {
       mutation.addedNodes.forEach((node) => {
         if (node.nodeType === Node.ELEMENT_NODE) {
@@ -164,6 +198,8 @@ function setupMutationObserver() {
 
 // Main initialization
 function init() {
+  if (!isEnabled) return
+  
   // Process existing images immediately
   if (document.readyState === 'loading') {
     // DOM is still loading, process what we have
@@ -181,8 +217,5 @@ function init() {
   }
 }
 
-// Start immediately (we're at document_start)
-init()
-
-// Make TypeScript treat this as a module
+// Export for TypeScript
 export {}
