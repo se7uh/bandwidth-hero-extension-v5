@@ -5,19 +5,19 @@ export default async function updateRedirectRules(state) {
   if (!state.enabled || !state.proxyUrl) {
     // If disabled or no proxy, clear rules
     await chrome.declarativeNetRequest.updateDynamicRules({
-      removeRuleIds: [1, 2], // Rule 1: Redirect, Rule 2: Headers
+      removeRuleIds: [1, 2],
       addRules: []
     });
     await updateIcon(false);
     return;
   }
 
-  // Rule 1: Allow specific requests with our bypass param (High Priority)
-  // Rule 2: Block all other image requests to save bandwidth (Low Priority)
+  // Rule 1: Allow specific requests with our bypass param (Higher Priority)
+  // Rule 2: Block all other image requests to prevent download (Lower Priority)
   
   try {
-      const proxyHostname = new URL(proxyUrl).hostname;
-      const excludedDomains = [...disabledHosts, proxyHostname, 'localhost', '127.0.0.1'];
+      const proxyHostname = new URL(state.proxyUrl).hostname;
+      const excludedDomains = [...(state.disabledHosts || []), proxyHostname, 'localhost', '127.0.0.1'];
 
       const allowRule = {
         id: 1,
@@ -26,7 +26,7 @@ export default async function updateRedirectRules(state) {
           type: 'allow'
         },
         condition: {
-          regexFilter: ".*[?&]bh-allow=1.*",
+          regexFilter: "[?&]bh-allow=1",
           resourceTypes: ["image", "xmlhttprequest"]
         }
       };
@@ -38,7 +38,7 @@ export default async function updateRedirectRules(state) {
           type: 'block'
         },
         condition: {
-          regexFilter: "^https?://.+$",
+          regexFilter: "^https?://.+\\.(jpg|jpeg|png|gif|webp|bmp|ico|svg)(\\?.*)?$",
           resourceTypes: ["image"],
           excludedInitiatorDomains: excludedDomains,
           excludedRequestDomains: excludedDomains
@@ -53,7 +53,7 @@ export default async function updateRedirectRules(state) {
       await updateIcon(true);
 
   } catch (e) {
-    console.error("Invalid Proxy URL", e);
+    console.error("Error updating DNR rules:", e);
   }
 }
 

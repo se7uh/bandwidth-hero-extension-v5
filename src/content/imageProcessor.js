@@ -1,76 +1,174 @@
-
-const processedImages = new Set();
-
-function processImage(img) {
-  if (processedImages.has(img)) return;
-  processedImages.add(img);
-
-  const originalSrc = img.src;
+// Early image interception to prevent race condition with DNR
+(function() {
+  'use strict';
   
-  if (!originalSrc || originalSrc.startsWith('data:') || originalSrc.startsWith('blob:')) {
-    return;
+  const processedImages = new WeakSet();
+  const pendingImages = new Map();
+  
+  // Check if URL should be processed (not data/blob/relative)
+  function isValidImageUrl(url) {
+    if (!url) return false;
+    if (url.startsWith('data:')) return false;
+    if (url.startsWith('blob:')) return false;
+    if (url.startsWith('javascript:')) return false;
+    if (url.includes('bh-allow=1')) return false;
+    return url.startsWith('http://') || url.startsWith('https://');
   }
-
-  // If already allowed, don't process again
-  if (originalSrc.includes('bh-allow=1')) {
-    return;
-  }
-
-  chrome.runtime.sendMessage(
-    {
-      action: 'COMPRESS_IMAGE',
-      imageUrl: originalSrc,
-      pageUrl: window.location.href
-    },
-    (response) => {
-      if (chrome.runtime.lastError) return;
-
-      if (response && response.success && response.dataUri) {
-        if (img.hasAttribute('srcset')) {
-          img.removeAttribute('srcset');
-        }
-        img.src = response.dataUri;
-        img.dataset.bhCompressed = 'true';
-      } else {
-        // Fallback: If not compressed, reload original with bypass param
-        const separator = originalSrc.includes('?') ? '&' : '?';
-        img.src = `${originalSrc}${separator}bh-allow=1`;
-      }
+  
+  // Intercept a single image
+  function interceptImage(img) {
+    if (processedImages.has(img) || pendingImages.has(img)) {
+      return;
     }
-  );
-}
-
-function scanImages() {
-  const images = document.querySelectorAll('img');
-  images.forEach(processImage);
-}
-
-// Observe for new images
-const observer = new MutationObserver((mutations) => {
-  mutations.forEach((mutation) => {
-    mutation.addedNodes.forEach((node) => {
-      if (node.nodeType === 1) { // ELEMENT_NODE
-        if (node.tagName === 'IMG') {
-          processImage(node);
+    
+    const originalSrc = img.src;
+    
+    if (!isValidImageUrl(originalSrc)) {
+      return;
+    }
+    
+    // Store original URL and clear src temporarily
+    // This prevents the browser from loading the image
+    img.dataset.bhOriginalSrc = originalSrc;
+    img.removeAttribute('src');
+    img.dataset.bhPending = 'true';
+    
+    pendingImages.set(img, {
+      url: originalSrc,
+      alt: img.alt,
+      width: img.width,
+      height: img.height
+    });
+    
+    // Process this image
+    processImage(img, originalSrc);
+  }
+  
+  // Process image through background script
+  function processImage(img, originalSrc) {
+    chrome.runtime.sendMessage(
+      {
+        action: 'COMPRESS_IMAGE',
+        imageUrl: originalSrc,
+        pageUrl: window.location.href
+      },
+      (response) => {
+        pendingImages.delete(img);
+        
+        if (chrome.runtime.lastError) {
+          console.error('Bandwidth Hero: Runtime error', chrome.runtime.lastError);
+          loadOriginal(img, originalSrc);
+          return;
+        }
+        
+        if (response && response.success && response.dataUri) {
+          // Success: inject compressed data URI
+          injectCompressedImage(img, response.dataUri);
         } else {
-          // Check children
-          const imgs = node.querySelectorAll('img');
-          imgs.forEach(processImage);
+          // Failed: load original with bypass param
+          loadOriginal(img, originalSrc, response?.reason);
         }
       }
+    );
+  }
+  
+  // Inject compressed image
+  function injectCompressedImage(img, dataUri) {
+    processedImages.add(img);
+    
+    // Remove srcset to prevent loading other versions
+    if (img.hasAttribute('srcset')) {
+      img.removeAttribute('srcset');
+    }
+    
+    // Set the compressed data URI
+    img.src = dataUri;
+    img.dataset.bhCompressed = 'true';
+    img.removeAttribute('data-bh-pending');
+    img.removeAttribute('data-bh-original-src');
+    
+    console.log('Bandwidth Hero: Image compressed', img.alt || '');
+  }
+  
+  // Load original image (when compression fails or is skipped)
+  function loadOriginal(img, originalSrc, reason = 'unknown') {
+    processedImages.add(img);
+    
+    // Add bypass param so DNR will allow this request
+    const separator = originalSrc.includes('?') ? '&' : '?';
+    const bypassUrl = `${originalSrc}${separator}bh-allow=1`;
+    
+    img.src = bypassUrl;
+    img.dataset.bhOriginal = 'true';
+    img.dataset.bhSkipReason = reason;
+    img.removeAttribute('data-bh-pending');
+    img.removeAttribute('data-bh-original-src');
+    
+    console.log('Bandwidth Hero: Loading original', reason, img.alt || '');
+  }
+  
+  // Process all existing images in the document
+  function processExistingImages() {
+    const images = document.querySelectorAll('img[src]');
+    images.forEach(interceptImage);
+  }
+  
+  // Setup mutation observer for dynamically added images
+  function setupMutationObserver() {
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        mutation.addedNodes.forEach((node) => {
+          if (node.nodeType === Node.ELEMENT_NODE) {
+            if (node.tagName === 'IMG') {
+              interceptImage(node);
+            } else {
+              // Check for images within added nodes
+              const images = node.querySelectorAll?.('img[src]');
+              if (images) {
+                images.forEach(interceptImage);
+              }
+            }
+          }
+        });
+        
+        // Also watch for src attribute changes
+        if (mutation.type === 'attributes' && mutation.attributeName === 'src') {
+          const img = mutation.target;
+          if (img.tagName === 'IMG' && !processedImages.has(img) && !pendingImages.has(img)) {
+            interceptImage(img);
+          }
+        }
+      });
     });
-  });
-});
-
-// Start observing
-observer.observe(document.body || document.documentElement, {
-  childList: true,
-  subtree: true
-});
-
-// Initial scan
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', scanImages);
-} else {
-  scanImages();
-}
+    
+    observer.observe(document.documentElement, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['src']
+    });
+  }
+  
+  // Main initialization
+  function init() {
+    // Process existing images immediately
+    if (document.readyState === 'loading') {
+      // DOM is still loading, process what we have
+      processExistingImages();
+      
+      // Process again when DOM is ready
+      document.addEventListener('DOMContentLoaded', () => {
+        processExistingImages();
+        setupMutationObserver();
+      });
+    } else {
+      // DOM is already ready
+      processExistingImages();
+      setupMutationObserver();
+    }
+  }
+  
+  // Start immediately (we're at document_start)
+  init();
+  
+})();

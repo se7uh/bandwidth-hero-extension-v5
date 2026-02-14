@@ -2,42 +2,13 @@ import defaultState from './defaults';
 import getHeaderIntValue from './background/getHeaderIntValue';
 import shouldCompress from './background/shouldCompress';
 import createProxyUrl from './utils/createProxyUrl';
+import updateRedirectRules from './background/updateRedirectRules';
 
 // In Manifest V3, background scripts are Service Workers.
-// We cannot block requests with webRequest.onBeforeRequest anymore.
-// We must use chrome.declarativeNetRequest.
+// We use chrome.declarativeNetRequest to block images early (preventing race condition),
+// then inject compressed images via content script.
 
 const STORAGE_KEY_STATS = 'statistics';
-
-// Helper to update dynamic DNR rules based on state
-async function updateRedirectRules(state) {
-  if (!state.enabled || !state.proxyUrl) {
-    // If disabled or no proxy, clear rules
-    await chrome.declarativeNetRequest.updateDynamicRules({
-      removeRuleIds: [1, 2], // Rule 1: Redirect, Rule 2: Headers
-      addRules: []
-    });
-    await updateIcon(false);
-    return;
-  }
-
-  // We no longer use DNR for redirection, but we keep this function
-  // to clean up any old rules that might be lingering from previous versions/states
-  // and to update the icon.
-  
-  try {
-    await chrome.declarativeNetRequest.updateDynamicRules({
-      removeRuleIds: [1, 2], // Cleanup old rules
-      addRules: [] // No new rules added
-    });
-
-    // Update icon based on state
-    await updateIcon(state.enabled && !!state.proxyUrl);
-
-  } catch (e) {
-    console.error("Error clearing DNR rules", e);
-  }
-}
 
 async function updateIcon(isEnabled) {
   const iconPath = isEnabled ? "assets/icon-128.png" : "assets/icon-128-disabled.png";
