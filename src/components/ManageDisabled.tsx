@@ -42,7 +42,7 @@ export default ({ disabledHosts = [], onChange }: ManageDisabledProps) => {
     <Stack gap="xs" style={{ height: '330px' }}>
       <Box>
         <Group justify="space-between" align="center">
-          <Group gap="xs">
+          <Group gap="sm">
             <IconWorldOff size={18} color="#2b69e3" />
             <Title order={4} size="14px">Manage Disabled Sites</Title>
           </Group>

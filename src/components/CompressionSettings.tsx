@@ -86,6 +86,7 @@ export default ({
           onClick={onConfigureProxy}
           leftSection={<IconSettings size={14} />}
           mb="xs"
+          styles={{ section: { marginRight: '8px' } }}
         >
           Configure Proxy Service
         </Button>
@@ -95,6 +96,7 @@ export default ({
             size="xs"
             leftSection={<IconHelpCircle size={14} />}
             onClick={() => window.open('https://bandwidth-hero.com/#how-it-works', '_blank')}
+            styles={{ section: { marginRight: '6px' } }}
           >
             How it works?
           </Button>
@@ -104,6 +106,7 @@ export default ({
             size="xs"
             leftSection={<IconHeart size={14} />}
             onClick={() => window.open('https://www.paypal.me/ayastreb', '_blank')}
+            styles={{ section: { marginRight: '6px' } }}
           >
             Donate!
           </Button>

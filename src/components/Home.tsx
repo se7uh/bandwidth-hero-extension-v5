@@ -60,8 +60,9 @@ export default ({
           icon={<IconInfoCircle size={16} />}
           styles={{
             root: { padding: '8px' },
-            title: { fontSize: '12px', marginBottom: '-10px' },
-            message: { fontSize: '11px' }
+            title: { fontSize: '12px', marginBottom: '2px' },
+            message: { fontSize: '11px' },
+            icon: { marginRight: '8px' }
           }}
         >
           Please configure your compression proxy URL to start saving data.
