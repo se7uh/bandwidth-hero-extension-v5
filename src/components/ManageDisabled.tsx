@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import debounce from 'lodash/debounce'
+import { brutalHover } from './styles'
 
 interface ManageDisabledProps {
   disabledHosts?: string[]
@@ -53,7 +54,7 @@ export default ({ disabledHosts = [], onChange }: ManageDisabledProps) => {
           <div className="text-[11px] text-[#555]">One domain per line. Images won't be compressed on these sites.</div>
         </div>
         {count > 0 && (
-          <div className="text-[10px] font-black bg-black text-white px-[7px] py-[2px] border-[3px] border-black shadow-[2px_2px_0_0_#000] whitespace-nowrap shrink-0 ml-2">
+          <div className={`text-[10px] font-black bg-black text-white px-[7px] py-[2px] border-[3px] border-black shadow-[2px_2px_0_0_#000] whitespace-nowrap shrink-0 ml-2 ${brutalHover}`}>
             {count} {count === 1 ? 'site' : 'sites'}
           </div>
         )}
@@ -63,7 +64,7 @@ export default ({ disabledHosts = [], onChange }: ManageDisabledProps) => {
         onChange={handleChange}
         placeholder="example.com"
         spellCheck={false}
-        className="flex-1 border-[3px] border-black p-2 font-mono text-[12px] font-bold shadow-[4px_4px_0_0_#000] outline-none resize-none min-h-[240px] transition-[transform,box-shadow] duration-100 focus:translate-x-[2px] focus:translate-y-[2px] focus:shadow-[2px_2px_0_0_#000]"
+        className={`flex-1 border-[3px] border-black p-2 font-mono text-[12px] font-bold shadow-[4px_4px_0_0_#000] outline-none resize-none min-h-[240px] ${brutalHover} focus:translate-x-[2px] focus:translate-y-[2px] focus:shadow-[2px_2px_0_0_#000]`}
       />
       <div className="text-[11px] font-bold text-right">
         {status === 'saving' && <SavingDots />}
