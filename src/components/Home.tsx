@@ -48,11 +48,11 @@ export default ({
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+    <div className="flex flex-col gap-4">
       {!proxyUrl && (
-        <div style={{ background: 'var(--brut-yellow)', border: 'var(--brut-border)', padding: '8px 12px', boxShadow: 'var(--brut-shadow)' }}>
-          <div style={{ fontWeight: 900, fontSize: '12px', textTransform: 'uppercase' }}>Setup Required</div>
-          <div style={{ fontSize: '11px', marginTop: '2px' }}>Please configure your compression proxy URL to start saving data.</div>
+        <div className="bg-brut-yellow border-[3px] border-black px-3 py-2 shadow-[4px_4px_0_0_#000]">
+          <div className="font-black text-[12px] uppercase">Setup Required</div>
+          <div className="text-[11px] mt-0.5">Please configure your compression proxy URL to start saving data.</div>
         </div>
       )}
       <UsageStatistics

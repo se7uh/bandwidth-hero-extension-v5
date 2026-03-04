@@ -10,14 +10,8 @@ interface SettingsProps {
 
 type SaveStatus = 'saved' | 'saving'
 
-const hoverIn = (e: React.MouseEvent<HTMLButtonElement>) => {
-  e.currentTarget.style.transform = 'translate(2px,2px)'
-  e.currentTarget.style.boxShadow = 'var(--brut-shadow-sm)'
-}
-const hoverOut = (e: React.MouseEvent<HTMLButtonElement>) => {
-  e.currentTarget.style.transform = ''
-  e.currentTarget.style.boxShadow = 'var(--brut-shadow)'
-}
+// Shared hover classes for brutalist buttons
+const brutHover = 'transition-[transform,box-shadow] duration-100 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0_0_#000]'
 
 export default ({ proxyUrl, onChange, onBack }: SettingsProps) => {
   const [value, setValue] = useState(proxyUrl)
@@ -51,10 +45,10 @@ export default ({ proxyUrl, onChange, onBack }: SettingsProps) => {
   }, [proxyUrl, status, value])
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+    <div className="flex flex-col gap-6">
       {/* Proxy URL */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-        <label style={{ fontWeight: 900, fontSize: '17px', textTransform: 'uppercase', background: 'var(--brut-white)', border: 'var(--brut-border)', padding: '2px 8px', display: 'inline-block', boxShadow: 'var(--brut-shadow)' }}>
+      <div className="flex flex-col gap-2">
+        <label className="font-black text-[17px] uppercase bg-white border-[3px] border-black px-2 py-0.5 inline-block shadow-[4px_4px_0_0_#000]">
           Proxy URL
         </label>
         <input
@@ -62,37 +56,31 @@ export default ({ proxyUrl, onChange, onBack }: SettingsProps) => {
           value={value}
           onChange={handleInputChange}
           placeholder="https://bh.psht.me/api/index"
-          style={{ width: '100%', border: 'var(--brut-border)', padding: '12px', fontFamily: 'monospace', fontWeight: 700, fontSize: '13px', boxShadow: 'var(--brut-shadow)', outline: 'none', boxSizing: 'border-box', background: 'var(--brut-white)', transition: 'transform 0.1s, box-shadow 0.1s' }}
-          onFocus={e => { e.currentTarget.style.transform = 'translate(2px,2px)'; e.currentTarget.style.boxShadow = 'var(--brut-shadow-sm)' }}
-          onBlur={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = 'var(--brut-shadow)' }}
+          className={`w-full border-[3px] border-black p-3 font-mono font-bold text-[13px] shadow-[4px_4px_0_0_#000] outline-none bg-white box-border ${brutHover} focus:translate-x-[2px] focus:translate-y-[2px] focus:shadow-[2px_2px_0_0_#000]`}
         />
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', paddingTop: '8px' }}>
+      <div className="flex flex-col gap-3 pt-2">
         {/* Save Config */}
         <button
           onClick={handleSave}
-          style={{ width: '100%', padding: '12px', background: 'var(--brut-black)', color: 'var(--brut-white)', border: 'var(--brut-border)', fontWeight: 900, textTransform: 'uppercase', fontSize: '17px', cursor: 'pointer', boxShadow: 'var(--brut-shadow)', transition: 'transform 0.1s, box-shadow 0.1s' }}
-          onMouseEnter={hoverIn}
-          onMouseLeave={hoverOut}
+          className={`w-full p-3 bg-black text-white border-[3px] border-black font-black uppercase text-[17px] cursor-pointer shadow-[4px_4px_0_0_#000] ${brutHover}`}
         >
           Save Config
         </button>
 
         {/* Install Guide + Donate */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', paddingTop: '8px' }}>
+        <div className="grid grid-cols-2 gap-3 pt-2">
           <button
             onClick={() => window.open('https://github.com/ayastreb/bandwidth-hero-proxy#installation', '_blank')}
-            style={{ padding: '12px', background: 'var(--brut-red)', color: 'var(--brut-black)', border: 'var(--brut-border)', fontWeight: 900, textTransform: 'uppercase', fontSize: '11px', cursor: 'pointer', boxShadow: 'var(--brut-shadow)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px', transition: 'transform 0.1s, box-shadow 0.1s' }}
-            onMouseEnter={hoverIn} onMouseLeave={hoverOut}
+            className={`p-3 bg-brut-red text-black border-[3px] border-black font-black uppercase text-[11px] cursor-pointer shadow-[4px_4px_0_0_#000] flex flex-col items-center justify-center gap-1 ${brutHover}`}
           >
             <ExternalLink size={20} strokeWidth={3} />
             <span>Install Guide</span>
           </button>
           <button
             onClick={() => window.open('https://www.paypal.me/ayastreb', '_blank')}
-            style={{ padding: '12px', background: 'var(--brut-teal)', color: 'var(--brut-black)', border: 'var(--brut-border)', fontWeight: 900, textTransform: 'uppercase', fontSize: '11px', cursor: 'pointer', boxShadow: 'var(--brut-shadow)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px', transition: 'transform 0.1s, box-shadow 0.1s' }}
-            onMouseEnter={hoverIn} onMouseLeave={hoverOut}
+            className={`p-3 bg-brut-teal text-black border-[3px] border-black font-black uppercase text-[11px] cursor-pointer shadow-[4px_4px_0_0_#000] flex flex-col items-center justify-center gap-1 ${brutHover}`}
           >
             <Heart size={20} strokeWidth={3} />
             <span>Donate</span>

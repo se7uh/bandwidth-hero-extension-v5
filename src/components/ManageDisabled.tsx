@@ -14,7 +14,7 @@ const SavingDots = () => {
     const interval = setInterval(() => setDots(d => (d % 3) + 1), 400)
     return () => clearInterval(interval)
   }, [])
-  return <span style={{ color: '#555' }}>Saving{'.'.repeat(dots)}</span>
+  return <span className="text-[#555]">Saving{'.'.repeat(dots)}</span>
 }
 
 export default ({ disabledHosts = [], onChange }: ManageDisabledProps) => {
@@ -46,14 +46,14 @@ export default ({ disabledHosts = [], onChange }: ManageDisabledProps) => {
   const count = value.split('\n').map(h => h.trim()).filter(h => h !== '').length
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', height: '100%' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+    <div className="flex flex-col gap-2 h-full">
+      <div className="flex justify-between items-start">
         <div>
-          <div style={{ fontWeight: 900, fontSize: '14px', textTransform: 'uppercase' }}>Disabled Sites</div>
-          <div style={{ fontSize: '11px', color: '#555' }}>One domain per line. Images won't be compressed on these sites.</div>
+          <div className="font-black text-[14px] uppercase">Disabled Sites</div>
+          <div className="text-[11px] text-[#555]">One domain per line. Images won't be compressed on these sites.</div>
         </div>
         {count > 0 && (
-          <div style={{ fontSize: '10px', fontWeight: 900, background: 'var(--brut-black)', color: 'var(--brut-white)', padding: '2px 7px', border: 'var(--brut-border)', boxShadow: 'var(--brut-shadow-sm)', whiteSpace: 'nowrap', flexShrink: 0, marginLeft: '8px' }}>
+          <div className="text-[10px] font-black bg-black text-white px-[7px] py-[2px] border-[3px] border-black shadow-[2px_2px_0_0_#000] whitespace-nowrap shrink-0 ml-2">
             {count} {count === 1 ? 'site' : 'sites'}
           </div>
         )}
@@ -62,14 +62,13 @@ export default ({ disabledHosts = [], onChange }: ManageDisabledProps) => {
         value={value}
         onChange={handleChange}
         placeholder="example.com"
-        style={{ flex: 1, border: 'var(--brut-border)', padding: '8px', fontFamily: 'monospace', fontSize: '12px', fontWeight: 700, boxShadow: 'var(--brut-shadow)', outline: 'none', resize: 'none', minHeight: '240px', transition: 'transform 0.1s, box-shadow 0.1s' }}
-        onFocus={e => { e.currentTarget.style.transform = 'translate(2px,2px)'; e.currentTarget.style.boxShadow = 'var(--brut-shadow-sm)' }}
-        onBlur={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = 'var(--brut-shadow)' }}
+        spellCheck={false}
+        className="flex-1 border-[3px] border-black p-2 font-mono text-[12px] font-bold shadow-[4px_4px_0_0_#000] outline-none resize-none min-h-[240px] transition-[transform,box-shadow] duration-100 focus:translate-x-[2px] focus:translate-y-[2px] focus:shadow-[2px_2px_0_0_#000]"
       />
-      <div style={{ fontSize: '11px', fontWeight: 700, textAlign: 'right' }}>
+      <div className="text-[11px] font-bold text-right">
         {status === 'saving' && <SavingDots />}
-        {status === 'saved' && <span style={{ color: 'green' }}>✓ Saved</span>}
-        {status === 'unsaved' && <span style={{ color: 'orange' }}>! Unsaved</span>}
+        {status === 'saved' && <span className="text-green-600">✓ Saved</span>}
+        {status === 'unsaved' && <span className="text-orange-500">! Unsaved</span>}
       </div>
     </div>
   )

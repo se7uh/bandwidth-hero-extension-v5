@@ -123,12 +123,12 @@ class Popup extends React.Component<{ currentUrl: string }, PopupState> {
     const { activeTab } = this.state
 
     return (
-      <div style={{ width: '380px', minHeight: '460px', background: 'var(--brut-yellow)', display: 'flex', flexDirection: 'column', outline: '3px solid #000' }}>
+      <div className="w-[380px] min-h-[460px] bg-brut-yellow flex flex-col outline outline-[3px] outline-black">
         {/* Header */}
         <Header enabled={this.state.enabled} onChange={this.enableSwitchWasChanged} />
 
         {/* Content */}
-        <div style={{ flex: 1, overflowY: 'auto', padding: '16px', background: 'var(--brut-yellow)' }}>
+        <div className="flex-1 overflow-y-auto p-4 bg-brut-yellow">
           {activeTab === 'home' && (
             <Home
               view="home"
@@ -172,14 +172,23 @@ class Popup extends React.Component<{ currentUrl: string }, PopupState> {
         </div>
 
         {/* Tab bar */}
-        <div style={{ display: 'flex', borderTop: '3px solid #000', background: 'var(--brut-white)' }}>
-          <button onClick={() => this.setState({ activeTab: 'home' })} style={{ flex: 1, padding: '16px', display: 'flex', justifyContent: 'center', alignItems: 'center', border: 'none', borderRight: '3px solid #000', background: activeTab === 'home' ? 'var(--brut-cyan)' : 'var(--brut-white)', cursor: 'pointer' }}>
+        <div className="flex border-t-[3px] border-black bg-white">
+          <button
+            onClick={() => this.setState({ activeTab: 'home' })}
+            className={`flex-1 p-4 flex justify-center items-center border-none border-r-[3px] border-black cursor-pointer ${activeTab === 'home' ? 'bg-brut-cyan' : 'bg-white'}`}
+          >
             <HomeIcon size={24} strokeWidth={3} />
           </button>
-          <button onClick={() => this.setState({ activeTab: 'sites' })} style={{ flex: 1, padding: '16px', display: 'flex', justifyContent: 'center', alignItems: 'center', border: 'none', borderRight: '3px solid #000', background: activeTab === 'sites' ? 'var(--brut-cyan)' : 'var(--brut-white)', cursor: 'pointer' }}>
+          <button
+            onClick={() => this.setState({ activeTab: 'sites' })}
+            className={`flex-1 p-4 flex justify-center items-center border-none border-r-[3px] border-black cursor-pointer ${activeTab === 'sites' ? 'bg-brut-cyan' : 'bg-white'}`}
+          >
             <Globe size={24} strokeWidth={3} />
           </button>
-          <button onClick={() => this.setState({ activeTab: 'settings' })} style={{ flex: 1, padding: '16px', display: 'flex', justifyContent: 'center', alignItems: 'center', border: 'none', background: activeTab === 'settings' ? 'var(--brut-cyan)' : 'var(--brut-white)', cursor: 'pointer' }}>
+          <button
+            onClick={() => this.setState({ activeTab: 'settings' })}
+            className={`flex-1 p-4 flex justify-center items-center border-none cursor-pointer ${activeTab === 'settings' ? 'bg-brut-cyan' : 'bg-white'}`}
+          >
             <SettingsIcon size={24} strokeWidth={3} />
           </button>
         </div>
