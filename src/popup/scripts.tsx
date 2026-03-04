@@ -123,7 +123,7 @@ class Popup extends React.Component<{ currentUrl: string }, PopupState> {
     const { activeTab } = this.state
 
     return (
-      <div style={{ width: '380px', minHeight: '460px', background: 'var(--brut-yellow)', display: 'flex', flexDirection: 'column', border: '3px solid #000', boxShadow: '8px 8px 0 0 #000' }}>
+      <div style={{ width: '380px', minHeight: '460px', background: 'var(--brut-yellow)', display: 'flex', flexDirection: 'column', outline: '3px solid #000' }}>
         {/* Header */}
         <Header enabled={this.state.enabled} onChange={this.enableSwitchWasChanged} />
 

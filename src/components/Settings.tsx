@@ -72,9 +72,9 @@ export default ({ proxyUrl, onChange, onBack }: SettingsProps) => {
         {/* Save Config */}
         <button
           onClick={handleSave}
-          style={{ width: '100%', padding: '12px', background: 'var(--brut-black)', color: 'var(--brut-white)', border: '3px solid transparent', fontWeight: 900, textTransform: 'uppercase', fontSize: '17px', cursor: 'pointer', boxShadow: '4px 4px 0 0 #fff', transition: 'all 0.1s' }}
-          onMouseEnter={e => { e.currentTarget.style.background = 'var(--brut-white)'; e.currentTarget.style.color = 'var(--brut-black)'; e.currentTarget.style.borderColor = 'var(--brut-black)'; e.currentTarget.style.boxShadow = 'var(--brut-shadow)' }}
-          onMouseLeave={e => { e.currentTarget.style.background = 'var(--brut-black)'; e.currentTarget.style.color = 'var(--brut-white)'; e.currentTarget.style.borderColor = 'transparent'; e.currentTarget.style.boxShadow = '4px 4px 0 0 #fff' }}
+          style={{ width: '100%', padding: '12px', background: 'var(--brut-black)', color: 'var(--brut-white)', border: 'var(--brut-border)', fontWeight: 900, textTransform: 'uppercase', fontSize: '17px', cursor: 'pointer', boxShadow: 'var(--brut-shadow)', transition: 'transform 0.1s, box-shadow 0.1s' }}
+          onMouseEnter={hoverIn}
+          onMouseLeave={hoverOut}
         >
           Save Config
         </button>
