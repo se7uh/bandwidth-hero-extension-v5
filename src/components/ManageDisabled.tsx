@@ -1,11 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { Textarea, Stack, Text, Title, Box, Group, Loader, rem } from '@mantine/core'
-import { IconCheck, IconAlertCircle, IconWorldOff } from '@tabler/icons-react'
 import debounce from 'lodash/debounce'
 
 interface ManageDisabledProps {
-  disabledHosts: string[]
-  onChange: (value: string) => void
+  disabledHosts?: string[]
+  onChange?: (value: string) => void
 }
 
 type SaveStatus = 'saved' | 'saving' | 'unsaved'
@@ -14,23 +12,21 @@ export default ({ disabledHosts = [], onChange }: ManageDisabledProps) => {
   const [value, setValue] = useState(Array.isArray(disabledHosts) ? disabledHosts.join('\n') : '')
   const [status, setStatus] = useState<SaveStatus>('saved')
 
-  // Create a debounced version of the onChange function
   const debouncedOnChange = useCallback(
     debounce((newValue: string) => {
-      onChange(newValue)
+      onChange?.(newValue)
       setStatus('saved')
     }, 1000),
     [onChange]
   )
 
-  const handleTextareaChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newValue = event.currentTarget.value
     setValue(newValue)
     setStatus('saving')
     debouncedOnChange(newValue)
   }
 
-  // Update local state if disabledHosts prop changes (e.g. from background sync)
   useEffect(() => {
     const joined = Array.isArray(disabledHosts) ? disabledHosts.join('\n') : ''
     if (joined !== value && status === 'saved') {
@@ -39,53 +35,26 @@ export default ({ disabledHosts = [], onChange }: ManageDisabledProps) => {
   }, [disabledHosts, status, value])
 
   return (
-    <Stack gap="xs" style={{ height: '330px' }}>
-      <Box>
-        <Group justify="space-between" align="center">
-          <Group gap="sm">
-            <IconWorldOff size={18} color="#2b69e3" />
-            <Title order={4} size="14px">Manage Disabled Sites</Title>
-          </Group>
-          <Group gap={4}>
-            {status === 'saving' && (
-              <>
-                <Loader size={12} />
-                <Text size="xs" c="blue" fw={500}>Saving...</Text>
-              </>
-            )}
-            {status === 'saved' && (
-              <>
-                <IconCheck size={12} color="green" />
-                <Text size="xs" c="green" fw={500}>Saved</Text>
-              </>
-            )}
-            {status === 'unsaved' && (
-              <>
-                <IconAlertCircle size={12} color="orange" />
-                <Text size="xs" c="orange" fw={500}>Unsaved changes</Text>
-              </>
-            )}
-          </Group>
-        </Group>
-        <Text size="xs" c="dimmed">
-          Add domains below to prevent Bandwidth Hero from compressing images on them.
-        </Text>
-      </Box>
-      <Textarea
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', height: '100%' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          <div style={{ fontWeight: 900, fontSize: '14px', textTransform: 'uppercase' }}>Disabled Sites</div>
+          <div style={{ fontSize: '11px', color: '#555' }}>One domain per line. Images won't be compressed on these sites.</div>
+        </div>
+        <div style={{ fontSize: '11px', fontWeight: 700 }}>
+          {status === 'saving' && <span style={{ color: '#555' }}>Saving…</span>}
+          {status === 'saved' && <span style={{ color: 'green' }}>✓ Saved</span>}
+          {status === 'unsaved' && <span style={{ color: 'orange' }}>! Unsaved</span>}
+        </div>
+      </div>
+      <textarea
         value={value}
-        onChange={handleTextareaChange}
+        onChange={handleChange}
         placeholder="example.com"
-        styles={{
-          root: { flex: 1, display: 'flex', flexDirection: 'column' },
-          wrapper: { flex: 1, display: 'flex', flexDirection: 'column' },
-          input: {
-            flex: 1,
-            fontFamily: 'monospace',
-            fontSize: '12px',
-            padding: '8px',
-          }
-        }}
+        style={{ flex: 1, border: 'var(--brut-border)', padding: '8px', fontFamily: 'monospace', fontSize: '12px', fontWeight: 700, boxShadow: 'var(--brut-shadow)', outline: 'none', resize: 'none', minHeight: '240px', transition: 'transform 0.1s, box-shadow 0.1s' }}
+        onFocus={e => { e.currentTarget.style.transform = 'translate(2px,2px)'; e.currentTarget.style.boxShadow = 'var(--brut-shadow-sm)' }}
+        onBlur={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = 'var(--brut-shadow)' }}
       />
-    </Stack>
+    </div>
   )
 }

@@ -1,44 +1,39 @@
 import React from 'react'
-import { Button } from '@mantine/core'
 import parseUrl from '../utils/parseUrl.js'
 
 interface DisableButtonProps {
-  disabledHosts: string[]
-  currentUrl: string
-  onSiteDisable: () => void
-  onSiteEnable: () => void
+  disabledHosts?: string[]
+  currentUrl?: string
+  onSiteDisable?: () => void
+  onSiteEnable?: () => void
 }
 
-export default ({ disabledHosts, currentUrl, onSiteDisable, onSiteEnable }: DisableButtonProps) => {
+const btnBase: React.CSSProperties = {
+  width: '100%',
+  padding: '10px',
+  border: 'var(--brut-border)',
+  boxShadow: 'var(--brut-shadow)',
+  fontWeight: 900,
+  fontSize: '13px',
+  textTransform: 'uppercase',
+  cursor: 'pointer',
+  transition: 'transform 0.1s, box-shadow 0.1s',
+}
+
+export default ({ disabledHosts = [], currentUrl = '', onSiteDisable, onSiteEnable }: DisableButtonProps) => {
   const { schema, hostname } = parseUrl(currentUrl)
 
   if (!/^https?:/i.test(schema)) return null
   const isDisabled = disabledHosts.includes(hostname)
 
   return (
-    <Button 
-      onClick={isDisabled ? onSiteEnable : onSiteDisable} 
-      variant="filled" 
-      color={isDisabled ? "green" : "red"}
-      fullWidth
-      radius="xs"
-      h={32}
-      styles={(theme) => ({
-        root: {
-          backgroundColor: isDisabled ? '#e6fffa' : '#fff5f5',
-          color: isDisabled ? '#2f855a' : '#e53e3e',
-          border: `1px solid ${isDisabled ? '#c6f6d5' : '#fed7d7'}`,
-          '&:hover': {
-            backgroundColor: isDisabled ? '#f0fff4' : '#fff5f5',
-          }
-        },
-        label: {
-          fontWeight: 700,
-          fontSize: '14px'
-        }
-      })}
+    <button
+      onClick={isDisabled ? onSiteEnable : onSiteDisable}
+      style={{ ...btnBase, background: isDisabled ? 'var(--brut-cyan)' : 'var(--brut-red)' }}
+      onMouseEnter={e => { e.currentTarget.style.transform = 'translate(2px,2px)'; e.currentTarget.style.boxShadow = 'var(--brut-shadow-sm)' }}
+      onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = 'var(--brut-shadow)' }}
     >
-      {isDisabled ? 'Enable on this site' : 'Disable on this site'}
-    </Button>
+      {isDisabled ? `Enable on ${hostname}` : `Disable on ${hostname}`}
+    </button>
   )
 }

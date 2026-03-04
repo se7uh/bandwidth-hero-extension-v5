@@ -1,40 +1,60 @@
+/* Neo-brutalist theme */
+:root {
+  --brut-yellow: #FFDE59;
+  --brut-cyan: #5DE2E7;
+  --brut-purple: #CB6CE6;
+  --brut-red: #FF6B6B;
+  --brut-teal: #4ECDC4;
+  --brut-black: #000;
+  --brut-white: #fff;
+  --brut-border: 3px solid #000;
+  --brut-shadow: 4px 4px 0 0 #000;
+  --brut-shadow-sm: 2px 2px 0 0 #000;
+}
+
+body {
+  margin: 0;
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background: var(--brut-yellow);
+}
+
 body.popup {
-  width: 340px;
-  min-height: 360px;
+  width: 380px;
+  min-height: 460px;
   height: auto;
 }
 
-.ui.toggle.checkbox .box:before,
-.ui.toggle.checkbox label:before {
-  background: rgba(0, 0, 0, 0.15);
-}
-
-.popup .header {
-  padding-top: 1em;
-}
-
-.popup .ui.container.footer {
-  padding: 1em 0;
-  display: flex;
-  justify-content: space-between;
-}
-
-.settings .wrapper {
+/* Range input brutalist style */
+input[type='range'] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 16px;
+  background: var(--brut-white);
+  border: 2px solid var(--brut-black);
+  cursor: pointer;
+  outline: none;
   width: 100%;
-  padding: 0 !important;
+}
+input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 24px;
+  background: var(--brut-black);
+  border: 2px solid var(--brut-white);
+  cursor: pointer;
+}
+input[type='range']::-moz-range-thumb {
+  width: 16px;
+  height: 24px;
+  background: var(--brut-black);
+  border: 2px solid var(--brut-white);
+  cursor: pointer;
+  border-radius: 0;
 }
 
-@media screen and (min-width: 960px) {
-  body.settings {
-    padding-top: 1em;
-  }
-
-  .settings .wrapper {
-    width: 640px;
-    margin: auto;
-  }
-}
-
-.settings .ui.container.header {
-  padding: 1em 1em 0 1em;
-}
+/* Scrollbar */
+::-webkit-scrollbar { width: 12px; }
+::-webkit-scrollbar-track { background: var(--brut-white); border-left: 2px solid var(--brut-black); }
+::-webkit-scrollbar-thumb { background: var(--brut-black); border: 2px solid var(--brut-white); }
+::-webkit-scrollbar-thumb:hover { background: var(--brut-purple); }
