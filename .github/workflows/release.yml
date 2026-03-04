@@ -52,6 +52,30 @@ jobs:
       - name: Build Firefox
         run: pnpm exec extension build --browser=firefox
 
+      - name: Install Chrome
+        run: |
+          wget -q -O - https://dl.google.com/linux/linux_signing_key.pub \
+            | sudo gpg --dearmor -o /usr/share/keyrings/google-chrome.gpg
+          echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] \
+            http://dl.google.com/linux/chrome/deb/ stable main" \
+            | sudo tee /etc/apt/sources.list.d/google-chrome.list
+          sudo apt-get update && sudo apt-get install -y google-chrome-stable
+
+      - name: Write private key
+        run: echo "${{ secrets.CHROME_CRX_PRIVATE_KEY }}" > key.pem
+
+      - name: Pack CRX
+        run: |
+          google-chrome \
+            --pack-extension=./dist/chromium \
+            --pack-extension-key=key.pem \
+            --no-message-box
+          mv dist/chromium.crx bandwidth-hero-v${{ steps.version.outputs.version }}.crx
+
+      - name: Remove private key
+        if: always()
+        run: rm -f key.pem
+
       - name: Zip Chromium build
         run: |
           cd dist/chromium
@@ -74,6 +98,17 @@ jobs:
           name: bandwidth-hero-firefox-v${{ steps.version.outputs.version }}
           path: bandwidth-hero-firefox-v${{ steps.version.outputs.version }}.zip
 
+      - name: Zip CRX
+        run: |
+          zip bandwidth-hero-crx-v${{ steps.version.outputs.version }}.zip \
+            bandwidth-hero-v${{ steps.version.outputs.version }}.crx
+
+      - name: Upload CRX artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bandwidth-hero-crx-v${{ steps.version.outputs.version }}
+          path: bandwidth-hero-crx-v${{ steps.version.outputs.version }}.zip
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
@@ -81,5 +116,6 @@ jobs:
           name: v${{ steps.version.outputs.version }}
           generate_release_notes: true
           files: |
+            bandwidth-hero-crx-v${{ steps.version.outputs.version }}.zip
             bandwidth-hero-chromium-v${{ steps.version.outputs.version }}.zip
             bandwidth-hero-firefox-v${{ steps.version.outputs.version }}.zip
