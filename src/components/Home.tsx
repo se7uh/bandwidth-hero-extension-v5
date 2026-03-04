@@ -4,6 +4,7 @@ import DisableButton from './DisableButton'
 import CompressionSettings from './CompressionSettings'
 import ManageDisabled from './ManageDisabled'
 import { brutalHover } from './styles'
+import type { ImageFormat } from '../defaults'
 
 interface HomeProps {
   view?: 'home' | 'sites'
@@ -16,12 +17,14 @@ interface HomeProps {
   currentUrl: string
   compressionLevel: number
   convertBw: boolean
+  imageFormat: ImageFormat
   proxyUrl?: string
   onSiteDisable: () => void
   onSiteEnable: () => void
   disabledOnChange?: (value: string) => void
   compressionLevelOnChange: (value: number) => void
   convertBwOnChange: () => void
+  imageFormatOnChange: (format: ImageFormat) => void
   onConfigureProxy: () => void
 }
 
@@ -32,12 +35,14 @@ export default ({
   currentUrl,
   compressionLevel,
   convertBw,
+  imageFormat,
   proxyUrl,
   onSiteDisable,
   onSiteEnable,
   disabledOnChange,
   compressionLevelOnChange,
   convertBwOnChange,
+  imageFormatOnChange,
 }: HomeProps) => {
   if (view === 'sites') {
     return (
@@ -70,8 +75,10 @@ export default ({
       <CompressionSettings
         convertBw={convertBw}
         compressionLevel={compressionLevel}
+        imageFormat={imageFormat}
         onConvertBwChange={convertBwOnChange}
         onCompressionLevelChange={compressionLevelOnChange}
+        onImageFormatChange={imageFormatOnChange}
       />
     </div>
   )

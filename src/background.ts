@@ -1,4 +1,4 @@
-import defaultState from './defaults'
+import defaultState, { Statistics, type State } from './defaults'
 import shouldCompress from './background/shouldCompress'
 import createProxyUrl from './utils/createProxyUrl'
 import updateRedirectRules from './background/updateRedirectRules'
@@ -11,7 +11,7 @@ const STORAGE_KEY_STATS = 'statistics'
 
 async function incrementStats(bytesProcessed: number, bytesSaved: number) {
   const stored = await chrome.storage.local.get(STORAGE_KEY_STATS)
-  const statistics = stored[STORAGE_KEY_STATS] || {
+  const statistics: Statistics = stored[STORAGE_KEY_STATS] ?? {
     filesProcessed: 0,
     bytesProcessed: 0,
     bytesSaved: 0
@@ -65,7 +65,7 @@ async function handleCompressImage(
   try {
     const { imageUrl, pageUrl } = request
     const stored = await chrome.storage.local.get(null)
-    const state = { ...defaultState, ...stored }
+    const state = { ...defaultState, ...stored } as typeof defaultState
 
     if (!state.enabled || !state.proxyUrl) {
       return { success: false, reason: 'disabled_or_no_proxy' }
@@ -90,7 +90,7 @@ async function handleCompressImage(
       imageUrl,
       state.compressionLevel,
       state.convertBw,
-      state.isWebpSupported
+      state.imageFormat ?? 'webp'
     )
 
     const response = await fetch(proxyUrl)
