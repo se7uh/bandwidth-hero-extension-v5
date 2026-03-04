@@ -1,81 +1,102 @@
-import isImage from 'is-image';
-import isPrivateNetwork from './isPrivateNetwork.js';
-import parseUrl from '../utils/parseUrl.js';
+import isImage from 'is-image'
+import isPrivateNetwork from './isPrivateNetwork'
+import parseUrl from '../utils/parseUrl'
 
-export default ({ imageUrl, pageUrl, compressed, proxyUrl, disabledHosts, enabled, type = 'image' }) => {
-  imageUrl = imageUrl.replace('#bh-no-compress=1', '').replace(/[\?&]bh-allow=1/, '');
+interface ShouldCompressOptions {
+  imageUrl: string
+  pageUrl: string
+  compressed: Set<string>
+  proxyUrl: string
+  disabledHosts: string[]
+  enabled: boolean
+  type?: string
+}
+
+const shouldCompress = ({
+  imageUrl,
+  pageUrl,
+  compressed,
+  proxyUrl,
+  disabledHosts,
+  enabled,
+  type = 'image'
+}: ShouldCompressOptions): boolean => {
+  const sanitizedImageUrl = imageUrl
+    .replace('#bh-no-compress=1', '')
+    .replace(/[\?&]bh-allow=1/, '')
 
   // If we aren't enabled we don't have to do anything.
   if (!enabled) {
-    return false;
+    return false
   }
 
   // If we don't have an proxy URL we can't compress.
   if (proxyUrl === '') {
-    return false;
+    return false
   }
 
   // Do not compress using the legacy proxy service. This proxy was default in
   // earlier versions of the extension and filled in by default. So for legacy
   // reasons we need to check for this.
   if (/compressor\.bandwidth-hero\.com/i.test(proxyUrl)) {
-    return false;
+    return false
   }
 
   // We keep a list of compressed images to prevent infinite loops. If the proxy
   // can't process an image and redirects the browser to the original it will come
   // back as a normal request. If we don't keep track it will keep looping around
   // sending the image to the proxy and proxy redirecting.
-  if (compressed.has(imageUrl)) {
-    return false;
+  if (compressed.has(sanitizedImageUrl)) {
+    return false
   }
 
   // Only process http or https other protocols including base64 encode URLs are
   // not supported.
-  const isHttps = imageUrl.toLowerCase().startsWith('https://') ||
-                  imageUrl.toLowerCase().startsWith('http://');
+  const isHttps =
+    sanitizedImageUrl.toLowerCase().startsWith('https://') ||
+    sanitizedImageUrl.toLowerCase().startsWith('http://')
   if (!isHttps) {
-    return false;
+    return false
   }
 
   // Do not process tracking URLs.
-  if (isTrackingPixel(imageUrl)) {
-    return false;
+  if (isTrackingPixel(sanitizedImageUrl)) {
+    return false
   }
 
   // Clean the image URL and checks if it starts with the proxy URL. Since the
   // request is our own redirect and shouldn't be processed.
-  const cleanImageUrl = stripQueryStringAndHashFromPath(imageUrl);
+  const cleanImageUrl = stripQueryStringAndHashFromPath(sanitizedImageUrl)
   if (cleanImageUrl.startsWith(proxyUrl)) {
-    return false;
+    return false
   }
 
   // Local images aren't accessible for out proxy.
-  if (isPrivateNetwork(imageUrl)) {
-    return false;
+  if (isPrivateNetwork(sanitizedImageUrl)) {
+    return false
   }
 
   // If the host of the page or image is disabled then do nothing.
   if (disabledHosts.includes(pageUrl)) {
-    return false;
+    return false
   }
 
   // If the host of the page or image is disabled then do nothing.
-  const imageHost = parseUrl(cleanImageUrl).hostname;
+  const imageHost = parseUrl(cleanImageUrl).hostname
   if (disabledHosts.includes(imageHost)) {
-    return false;
+    return false
   }
 
   // Check if the image doesn't have an extension we can't compress.
-  const notSupported = ['ico', 'svg'];
-  const matched = notSupported.filter(ext => imageUrl.endsWith('.' + ext));
+  const notSupported = ['ico', 'svg']
+  const matched = notSupported.filter(ext => sanitizedImageUrl.endsWith('.' + ext))
   if (matched.length > 0) {
-    return false;
+    return false
   }
 
   // Do not process favicons. Those are too small to process most of the time.
-  if (imageUrl.includes('favicon')) {
-    return false;
+  if (sanitizedImageUrl.includes('favicon')) {
+    return false
   }
 
   // Firefox will set some images behind a xmlhttprequest instead of
@@ -84,13 +105,13 @@ export default ({ imageUrl, pageUrl, compressed, proxyUrl, disabledHosts, enable
   // to only get images. But, do this only if the type of the request is
   // xmlhttprequest.
   if (type.toLowerCase() === 'xmlhttprequest' && !isImage(cleanImageUrl)) {
-    return false;
+    return false
   }
 
-  return true;
-};
+  return true
+}
 
-function isTrackingPixel(url) {
+function isTrackingPixel(url: string): boolean {
   const trackingLinks = [
     /pagead/i,
     /(pixel|cleardot)\.*(gif|jpg|jpeg)/i,
@@ -105,16 +126,18 @@ function isTrackingPixel(url) {
     /yahoo\.([a-z\.]+)\/pixel/i,
     /criteo\.net\/img/i,
     /ad\.doubleclick\.net/i
-  ];
+  ]
 
   for (const link of trackingLinks) {
     if (link.test(url)) {
-      return true;
+      return true
     }
   }
-  return false;
+  return false
 }
 
-function stripQueryStringAndHashFromPath(url) {
-  return url.split('?')[0].split('#')[0];
+function stripQueryStringAndHashFromPath(url: string): string {
+  return url.split('?')[0].split('#')[0]
 }
+
+export default shouldCompress

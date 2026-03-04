@@ -4,9 +4,9 @@ import { Netmask } from 'netmask'
  * Check if an URL is localhost or part of a private IP. If it is private we
  * can't reach it with our proxy. So we should skip compressing those URLs.
  */
-export default (url) => {
+const isPrivateNetwork = (url: string): boolean => {
   if (url === 'localhost' || /^https?:\/\/(localhost|127.0.0.1).*/i.test(url)) {
-    return true;
+    return true
   }
 
   const ipAddress = url.match(/^https?:\/\/(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}).*/)
@@ -23,3 +23,5 @@ export default (url) => {
 
   return false
 }
+
+export default isPrivateNetwork
