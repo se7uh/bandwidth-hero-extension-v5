@@ -1,121 +1,42 @@
 import React from 'react'
-import { Stack, Switch, Slider, Text, Group, Box, Button } from '@mantine/core'
-import { IconSettings, IconHelpCircle, IconHeart } from '@tabler/icons-react'
+import { Check } from 'lucide-react'
+import { brutalHover } from './styles'
 
 interface CompressionSettingsProps {
   convertBw: boolean
   compressionLevel: number
   onConvertBwChange: () => void
   onCompressionLevelChange: (value: number) => void
-  onConfigureProxy: () => void
 }
 
-export default ({ 
-  convertBw, 
-  compressionLevel, 
-  onConvertBwChange, 
-  onCompressionLevelChange,
-  onConfigureProxy
-}: CompressionSettingsProps) => {
+export default ({ convertBw, compressionLevel, onConvertBwChange, onCompressionLevelChange }: CompressionSettingsProps) => {
   return (
-    <Stack gap="xs" mt="xs">
-      <Box p="xs" pb="xl" style={{ border: '1px solid #eee', borderRadius: '8px' }}>
-        <Group justify="space-between" mb={2}>
-          <Text size="xs" fw={700} c="dimmed">COMPRESSION QUALITY</Text>
-          <Box style={{ border: '1px solid #dee2e6', borderRadius: '4px', padding: '0 4px' }}>
-            <Text size="xs" fw={700} c="blue">{compressionLevel}%</Text>
-          </Box>
-        </Group>
-        <Slider
+    <div className={`bg-brut-purple border-[3px] border-black p-4 shadow-[4px_4px_0_0_#000] flex flex-col gap-4 ${brutalHover}`}>
+      {/* Quality slider */}
+      <div className="flex flex-col gap-2">
+        <div className="flex justify-between font-bold text-[13px]">
+          <label>QUALITY</label>
+          <span className="bg-white border-2 border-black px-1">{compressionLevel}%</span>
+        </div>
+        <input
+          type="range"
+          min="1"
+          max="100"
           value={compressionLevel}
-          onChange={onCompressionLevelChange}
-          min={1}
-          max={100}
-          step={1}
-          label={null}
-          marks={[
-            { value: 0, label: '0%' },
-            { value: 20, label: '20%' },
-            { value: 40, label: '40%' },
-            { value: 60, label: '60%' },
-            { value: 80, label: '80%' },
-            { value: 100, label: '100%' },
-          ]}
-          styles={{
-            thumb: {
-              borderWidth: rem(2),
-              width: rem(20),
-              height: rem(20),
-            },
-            track: {
-              height: rem(6),
-            },
-            markWrapper: {
-              top: '50%',
-            },
-            mark: {
-              width: rem(8),
-              height: rem(8),
-              borderRadius: rem(8),
-              borderWidth: rem(2),
-              transform: 'translateY(-50%)',
-            },
-            markLabel: {
-              fontSize: rem(9),
-              top: rem(10),
-              transform: 'translateX(-50%)',
-            }
-          }}
+          onChange={e => onCompressionLevelChange(parseInt(e.target.value))}
         />
-      </Box>
+      </div>
 
-      <Group justify="space-between" mt={4} mb={4}>
-        <Text size="sm" fw={500}>Black & White Mode</Text>
-        <Switch
-          checked={convertBw}
-          onChange={onConvertBwChange}
-          size="sm"
-        />
-      </Group>
-
-      <Box mt="xs">
-        <Button 
-          variant="light"
-          fullWidth
-          size="xs" 
-          onClick={onConfigureProxy}
-          leftSection={<IconSettings size={14} />}
-          mb="xs"
-          styles={{ section: { marginRight: '8px' } }}
+      {/* Grayscale mode */}
+      <div className="flex justify-between items-center pt-1">
+        <label className="font-bold text-[13px] uppercase">Grayscale Mode</label>
+        <button
+          onClick={onConvertBwChange}
+          className={`w-6 h-6 border-[3px] border-black cursor-pointer flex items-center justify-center p-0 ${convertBw ? 'bg-black text-white' : 'bg-white'}`}
         >
-          Configure Proxy Service
-        </Button>
-        <Group grow gap="sm">
-          <Button
-            variant="outline"
-            size="xs"
-            leftSection={<IconHelpCircle size={14} />}
-            onClick={() => window.open('https://bandwidth-hero.com/#how-it-works', '_blank')}
-            styles={{ section: { marginRight: '6px' } }}
-          >
-            How it works?
-          </Button>
-          <Button
-            variant="outline"
-            color="orange"
-            size="xs"
-            leftSection={<IconHeart size={14} />}
-            onClick={() => window.open('https://www.paypal.me/ayastreb', '_blank')}
-            styles={{ section: { marginRight: '6px' } }}
-          >
-            Donate!
-          </Button>
-        </Group>
-      </Box>
-    </Stack>
+          {convertBw && <Check size={16} strokeWidth={4} />}
+        </button>
+      </div>
+    </div>
   )
-}
-
-function rem(value: number) {
-  return `${value / 16}rem`
 }

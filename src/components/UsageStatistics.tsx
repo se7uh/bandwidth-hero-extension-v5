@@ -1,10 +1,10 @@
 import React from 'react'
-import { Group, Text, Divider, Stack, rem } from '@mantine/core'
+import { brutalHover } from './styles'
 
 interface UsageStatisticsProps {
-  filesProcessed: number
-  bytesProcessed: number
-  bytesSaved: number
+  filesProcessed?: number
+  bytesProcessed?: number
+  bytesSaved?: number
 }
 
 function formatBytes(bytes: number) {
@@ -12,44 +12,20 @@ function formatBytes(bytes: number) {
   const k = 1024
   const sizes = ['B', 'KB', 'MB', 'GB']
   const i = Math.floor(Math.log(bytes) / Math.log(k))
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + sizes[i]
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i]
 }
 
 export default ({ filesProcessed = 0, bytesProcessed = 0, bytesSaved = 0 }: UsageStatisticsProps) => {
-  const percentage = bytesProcessed === 0 ? 0 : Math.round(bytesSaved / bytesProcessed * 100)
-
   return (
-    <Stack gap={0} align="center" my={4}>
-      <Group gap={4} align="baseline">
-        <Text style={{ fontSize: rem(32), fontWeight: 700, color: '#2b69e3', lineHeight: 1 }}>
-          {percentage}%
-        </Text>
-        <Text size="xs" c="dimmed" fw={500} style={{ fontSize: rem(10) }}>
-          saved
-        </Text>
-      </Group>
-
-      <Group gap="md" justify="center" style={{ width: '100%' }} mt={2}>
-        <Stack gap={0} align="center" style={{ flex: 1 }}>
-          <Text fw={700} size="sm">
-            {formatBytes(bytesSaved)}
-          </Text>
-          <Text c="dimmed" fw={700} style={{ fontSize: rem(9) }}>
-            DATA
-          </Text>
-        </Stack>
-        
-        <Divider orientation="vertical" h={24} />
-
-        <Stack gap={0} align="center" style={{ flex: 1 }}>
-          <Text fw={700} size="sm">
-            {filesProcessed.toLocaleString()}
-          </Text>
-          <Text c="dimmed" fw={700} style={{ fontSize: rem(9) }}>
-            IMAGES
-          </Text>
-        </Stack>
-      </Group>
-    </Stack>
+    <div className="grid grid-cols-2 gap-3">
+      <div className={`bg-white border-[3px] border-black p-3 shadow-[4px_4px_0_0_#000] ${brutalHover}`}>
+        <div className="text-[28px] font-black leading-none">{formatBytes(bytesSaved)}</div>
+        <div className="font-bold text-[10px] uppercase bg-black text-white inline-block px-1 mt-1">Data Saved</div>
+      </div>
+      <div className={`bg-white border-[3px] border-black p-3 shadow-[4px_4px_0_0_#000] ${brutalHover}`}>
+        <div className="text-[28px] font-black leading-none">{filesProcessed.toLocaleString()}</div>
+        <div className="font-bold text-[10px] uppercase bg-black text-white inline-block px-1 mt-1">Images</div>
+      </div>
+    </div>
   )
 }
