@@ -4,6 +4,8 @@ export interface Statistics {
   bytesSaved: number
 }
 
+export type ImageFormat = 'webp' | 'jpeg' | 'avif'
+
 export interface State {
   enabled: boolean
   statistics: Statistics
@@ -13,6 +15,7 @@ export interface State {
   proxyUrl: string
   isWebpSupported: boolean
   colorScheme: 'light' | 'dark'
+  imageFormat: ImageFormat
 }
 
 const defaultState: State = {
@@ -27,7 +30,8 @@ const defaultState: State = {
   compressionLevel: 40,
   proxyUrl: '',
   isWebpSupported: true,
-  colorScheme: 'light'
+  colorScheme: 'light',
+  imageFormat: 'webp'
 }
 
 export default defaultState

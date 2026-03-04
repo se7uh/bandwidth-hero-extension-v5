@@ -1,15 +1,24 @@
 import React from 'react'
 import { Check } from 'lucide-react'
 import { brutalHover } from './styles'
+import type { ImageFormat } from '../defaults'
 
 interface CompressionSettingsProps {
   convertBw: boolean
   compressionLevel: number
+  imageFormat: ImageFormat
   onConvertBwChange: () => void
   onCompressionLevelChange: (value: number) => void
+  onImageFormatChange: (format: ImageFormat) => void
 }
 
-export default ({ convertBw, compressionLevel, onConvertBwChange, onCompressionLevelChange }: CompressionSettingsProps) => {
+const FORMATS: { value: ImageFormat; label: string }[] = [
+  { value: 'webp', label: 'WebP' },
+  { value: 'avif', label: 'AVIF' },
+  { value: 'jpeg', label: 'JPEG' },
+]
+
+export default ({ convertBw, compressionLevel, imageFormat, onConvertBwChange, onCompressionLevelChange, onImageFormatChange }: CompressionSettingsProps) => {
   return (
     <div className={`bg-brut-purple border-[3px] border-black p-4 shadow-[4px_4px_0_0_#000] flex flex-col gap-4 ${brutalHover}`}>
       {/* Quality slider */}
@@ -25,6 +34,26 @@ export default ({ convertBw, compressionLevel, onConvertBwChange, onCompressionL
           value={compressionLevel}
           onChange={e => onCompressionLevelChange(parseInt(e.target.value))}
         />
+      </div>
+
+      {/* Image format picker */}
+      <div className="flex flex-col gap-2">
+        <label className="font-bold text-[13px] uppercase">Output Format</label>
+        <div className="flex gap-0">
+          {FORMATS.map(({ value, label }) => (
+            <button
+              key={value}
+              onClick={() => onImageFormatChange(value)}
+              className={`flex-1 py-1.5 border-[3px] border-black font-black text-[12px] uppercase cursor-pointer -ml-[3px] first:ml-0 ${
+                imageFormat === value
+                  ? 'bg-black text-white'
+                  : 'bg-white text-black'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Grayscale mode */}

@@ -1,21 +1,20 @@
+import type { ImageFormat } from '../defaults'
+
 const createProxyUrl = (
   proxyUrl: string,
   originalUrl: string,
   compressionLevel: number,
   convertBw: boolean,
-  isWebpSupported: boolean
+  imageFormat: ImageFormat
 ): string => {
-  const isJpeg = isWebpSupported ? 0 : 1
-  const isBw = convertBw ? 1 : 0
-  const level = compressionLevel
+  const jpeg = imageFormat === 'jpeg' ? 1 : 0
+  const avif = imageFormat === 'avif' ? 1 : 0
+  const bw = convertBw ? 1 : 0
 
   // Remove trailing slash if present
   const cleanProxy = proxyUrl.replace(/\/$/, '')
 
-  // We encode the original URL to ensure it travels safely as a query parameter
-  return `${cleanProxy}?jpeg=${isJpeg}&bw=${isBw}&l=${level}&url=${encodeURIComponent(
-    originalUrl
-  )}`
+  return `${cleanProxy}?jpeg=${jpeg}&avif=${avif}&bw=${bw}&l=${compressionLevel}&url=${encodeURIComponent(originalUrl)}`
 }
 
 export default createProxyUrl

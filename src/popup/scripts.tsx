@@ -7,6 +7,7 @@ import Home from '../components/Home'
 import Settings from '../components/Settings'
 import parseUrl from '../utils/parseUrl'
 import defaults from '../defaults'
+import type { ImageFormat } from '../defaults'
 
 type ActiveTab = 'home' | 'sites' | 'settings'
 
@@ -22,6 +23,7 @@ interface PopupState {
   compressionLevel: number
   isWebpSupported: boolean
   proxyUrl: string
+  imageFormat: ImageFormat
   activeTab: ActiveTab
 }
 
@@ -37,6 +39,7 @@ class Popup extends React.Component<{ currentUrl: string }, PopupState> {
       compressionLevel: 40,
       isWebpSupported: true,
       proxyUrl: '',
+      imageFormat: 'webp',
       activeTab: 'home',
     }
   }
@@ -51,6 +54,7 @@ class Popup extends React.Component<{ currentUrl: string }, PopupState> {
         compressionLevel: stored.compressionLevel ?? defaults.compressionLevel,
         isWebpSupported: stored.isWebpSupported ?? true,
         proxyUrl: stored.proxyUrl ?? defaults.proxyUrl,
+        imageFormat: stored.imageFormat ?? defaults.imageFormat,
       })
     })
     chrome.storage.onChanged.addListener(this.stateWasUpdatedFromBackground)
@@ -110,6 +114,11 @@ class Popup extends React.Component<{ currentUrl: string }, PopupState> {
     this.setState({ proxyUrl })
   }
 
+  imageFormatWasChanged = (imageFormat: ImageFormat) => {
+    chrome.storage.local.set({ imageFormat })
+    this.setState({ imageFormat })
+  }
+
   stateWasUpdatedFromBackground = (changes: { [key: string]: chrome.storage.StorageChange }) => {
     const changedItems = Object.keys(changes)
     for (const item of changedItems) {
@@ -137,11 +146,13 @@ class Popup extends React.Component<{ currentUrl: string }, PopupState> {
               currentUrl={this.props.currentUrl}
               compressionLevel={this.state.compressionLevel}
               convertBw={this.state.convertBw}
+              imageFormat={this.state.imageFormat}
               proxyUrl={this.state.proxyUrl}
               onSiteDisable={this.siteWasDisabled}
               onSiteEnable={this.siteWasEnabled}
               compressionLevelOnChange={this.compressionLevelWasChanged}
               convertBwOnChange={this.convertBwWasChanged}
+              imageFormatOnChange={this.imageFormatWasChanged}
               onConfigureProxy={() => this.setState({ activeTab: 'settings' })}
             />
           )}
@@ -153,12 +164,14 @@ class Popup extends React.Component<{ currentUrl: string }, PopupState> {
               currentUrl={this.props.currentUrl}
               compressionLevel={this.state.compressionLevel}
               convertBw={this.state.convertBw}
+              imageFormat={this.state.imageFormat}
               proxyUrl={this.state.proxyUrl}
               onSiteDisable={this.siteWasDisabled}
               onSiteEnable={this.siteWasEnabled}
               disabledOnChange={this.disabledHostsWasChanged}
               compressionLevelOnChange={this.compressionLevelWasChanged}
               convertBwOnChange={this.convertBwWasChanged}
+              imageFormatOnChange={this.imageFormatWasChanged}
               onConfigureProxy={() => this.setState({ activeTab: 'settings' })}
             />
           )}
