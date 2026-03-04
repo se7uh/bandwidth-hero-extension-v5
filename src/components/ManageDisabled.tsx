@@ -1,36 +1,42 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { Textarea, Stack, Text, Title, Box, Group, Loader, rem } from '@mantine/core'
-import { IconCheck, IconAlertCircle, IconWorldOff } from '@tabler/icons-react'
 import debounce from 'lodash/debounce'
+import { brutalHover } from './styles'
 
 interface ManageDisabledProps {
-  disabledHosts: string[]
-  onChange: (value: string) => void
+  disabledHosts?: string[]
+  onChange?: (value: string) => void
 }
 
 type SaveStatus = 'saved' | 'saving' | 'unsaved'
+
+const SavingDots = () => {
+  const [dots, setDots] = useState(1)
+  useEffect(() => {
+    const interval = setInterval(() => setDots(d => (d % 3) + 1), 400)
+    return () => clearInterval(interval)
+  }, [])
+  return <span className="text-[#555]">Saving{'.'.repeat(dots)}</span>
+}
 
 export default ({ disabledHosts = [], onChange }: ManageDisabledProps) => {
   const [value, setValue] = useState(Array.isArray(disabledHosts) ? disabledHosts.join('\n') : '')
   const [status, setStatus] = useState<SaveStatus>('saved')
 
-  // Create a debounced version of the onChange function
   const debouncedOnChange = useCallback(
     debounce((newValue: string) => {
-      onChange(newValue)
+      onChange?.(newValue)
       setStatus('saved')
     }, 1000),
     [onChange]
   )
 
-  const handleTextareaChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newValue = event.currentTarget.value
     setValue(newValue)
     setStatus('saving')
     debouncedOnChange(newValue)
   }
 
-  // Update local state if disabledHosts prop changes (e.g. from background sync)
   useEffect(() => {
     const joined = Array.isArray(disabledHosts) ? disabledHosts.join('\n') : ''
     if (joined !== value && status === 'saved') {
@@ -38,54 +44,33 @@ export default ({ disabledHosts = [], onChange }: ManageDisabledProps) => {
     }
   }, [disabledHosts, status, value])
 
+  const count = value.split('\n').map(h => h.trim()).filter(h => h !== '').length
+
   return (
-    <Stack gap="xs" style={{ height: '330px' }}>
-      <Box>
-        <Group justify="space-between" align="center">
-          <Group gap="sm">
-            <IconWorldOff size={18} color="#2b69e3" />
-            <Title order={4} size="14px">Manage Disabled Sites</Title>
-          </Group>
-          <Group gap={4}>
-            {status === 'saving' && (
-              <>
-                <Loader size={12} />
-                <Text size="xs" c="blue" fw={500}>Saving...</Text>
-              </>
-            )}
-            {status === 'saved' && (
-              <>
-                <IconCheck size={12} color="green" />
-                <Text size="xs" c="green" fw={500}>Saved</Text>
-              </>
-            )}
-            {status === 'unsaved' && (
-              <>
-                <IconAlertCircle size={12} color="orange" />
-                <Text size="xs" c="orange" fw={500}>Unsaved changes</Text>
-              </>
-            )}
-          </Group>
-        </Group>
-        <Text size="xs" c="dimmed">
-          Add domains below to prevent Bandwidth Hero from compressing images on them.
-        </Text>
-      </Box>
-      <Textarea
+    <div className="flex flex-col gap-2 h-full">
+      <div className="flex justify-between items-start">
+        <div>
+          <div className="font-black text-[14px] uppercase">Disabled Sites</div>
+          <div className="text-[11px] text-[#555]">One domain per line. Images won't be compressed on these sites.</div>
+        </div>
+        {count > 0 && (
+          <div className={`text-[10px] font-black bg-black text-white px-[7px] py-[2px] border-[3px] border-black shadow-[2px_2px_0_0_#000] whitespace-nowrap shrink-0 ml-2 ${brutalHover}`}>
+            {count} {count === 1 ? 'site' : 'sites'}
+          </div>
+        )}
+      </div>
+      <textarea
         value={value}
-        onChange={handleTextareaChange}
+        onChange={handleChange}
         placeholder="example.com"
-        styles={{
-          root: { flex: 1, display: 'flex', flexDirection: 'column' },
-          wrapper: { flex: 1, display: 'flex', flexDirection: 'column' },
-          input: {
-            flex: 1,
-            fontFamily: 'monospace',
-            fontSize: '12px',
-            padding: '8px',
-          }
-        }}
+        spellCheck={false}
+        className={`flex-1 border-[3px] border-black p-2 font-mono text-[12px] font-bold shadow-[4px_4px_0_0_#000] outline-none resize-none min-h-[240px] ${brutalHover} focus:translate-x-[2px] focus:translate-y-[2px] focus:shadow-[2px_2px_0_0_#000]`}
       />
-    </Stack>
+      <div className="text-[11px] font-bold text-right">
+        {status === 'saving' && <SavingDots />}
+        {status === 'saved' && <span className="text-green-600">✓ Saved</span>}
+        {status === 'unsaved' && <span className="text-orange-500">! Unsaved</span>}
+      </div>
+    </div>
   )
 }

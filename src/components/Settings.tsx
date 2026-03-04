@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { Stack, Box, Group, Text, Title, TextInput, Button, Divider, ActionIcon, Loader } from '@mantine/core'
-import { IconArrowLeft, IconWorld, IconBrandDocker, IconCheck, IconAlertCircle, IconSettings } from '@tabler/icons-react'
+import { ExternalLink, Heart } from 'lucide-react'
 import debounce from 'lodash/debounce'
+import { brutalHover } from './styles'
 
 interface SettingsProps {
   proxyUrl: string
@@ -15,7 +15,6 @@ export default ({ proxyUrl, onChange, onBack }: SettingsProps) => {
   const [value, setValue] = useState(proxyUrl)
   const [status, setStatus] = useState<SaveStatus>('saved')
 
-  // Create a debounced version of the onChange function
   const debouncedOnChange = useCallback(
     debounce((newValue: string) => {
       onChange(newValue)
@@ -31,7 +30,12 @@ export default ({ proxyUrl, onChange, onBack }: SettingsProps) => {
     debouncedOnChange(newValue)
   }
 
-  // Update local state if proxyUrl prop changes
+  const handleSave = () => {
+    debouncedOnChange.cancel()
+    onChange(value)
+    setStatus('saved')
+  }
+
   useEffect(() => {
     if (proxyUrl !== value && status === 'saved') {
       setValue(proxyUrl)
@@ -39,69 +43,48 @@ export default ({ proxyUrl, onChange, onBack }: SettingsProps) => {
   }, [proxyUrl, status, value])
 
   return (
-    <Box style={{ display: 'flex', flexDirection: 'column' }}>
-      <Box p="md" bg="#2b69e3" style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-        <Group justify="space-between" align="center">
-          <Group gap="xs">
-            <ActionIcon variant="transparent" onClick={onBack} color="white">
-              <IconArrowLeft size={20} />
-            </ActionIcon>
-            <IconSettings size={20} color="white" />
-            <Title order={3} size="20px" c="white">Settings</Title>
-          </Group>
-          
-          <Group gap={4}>
-            {status === 'saving' && (
-              <>
-                <Loader size={12} color="white" />
-                <Text size="xs" c="white" fw={500} style={{ opacity: 0.9 }}>Saving...</Text>
-              </>
-            )}
-            {status === 'saved' && value && (
-              <>
-                <IconCheck size={12} color="white" />
-                <Text size="xs" c="white" fw={500} style={{ opacity: 0.9 }}>Saved</Text>
-              </>
-            )}
-          </Group>
-        </Group>
-      </Box>
+    <div className="flex flex-col gap-6">
+      {/* Proxy URL */}
+      <div className="flex flex-col gap-2">
+        <label className={`font-black text-[17px] uppercase bg-white border-[3px] border-black px-2 py-0.5 inline-block shadow-[4px_4px_0_0_#000] ${brutalHover}`}>
+          Proxy URL
+        </label>
+        <input
+          type="text"
+          value={value}
+          onChange={handleInputChange}
+          placeholder="https://bh.psht.me/api/index"
+          className={`w-full border-[3px] border-black p-3 font-mono font-bold text-[13px] shadow-[4px_4px_0_0_#000] outline-none bg-white box-border ${brutalHover} focus:translate-x-[2px] focus:translate-y-[2px] focus:shadow-[2px_2px_0_0_#000]`}
+        />
+      </div>
 
-      <Stack p="md" gap="lg">
-        <Box>
-          <Group gap="xs" mb={5}>
-            <IconWorld size={18} color="#2b69e3" />
-            <Text size="sm" fw={700}>Proxy URL</Text>
-          </Group>
-          <Text size="xs" c="dimmed" mb={5}>
-            Enter the URL of your self-hosted compression instance.
-          </Text>
-          <TextInput
-            value={value}
-            onChange={handleInputChange}
-            placeholder="https://your-proxy.com"
-            size="md"
-          />
-        </Box>
+      <div className="flex flex-col gap-3 pt-2">
+        {/* Save Config */}
+        <button
+          onClick={handleSave}
+          className={`w-full p-3 bg-black text-white border-[3px] border-black font-black uppercase text-[17px] cursor-pointer shadow-[4px_4px_0_0_#000] ${brutalHover}`}
+        >
+          Save Config
+        </button>
 
-        <Divider />
-
-        <Box>
-          <Text size="xs" fw={700} c="dimmed" mb="sm">INSTALLATION GUIDES</Text>
-          <Stack gap="xs">
-            <Button 
-              variant="outline" 
-              color="gray" 
-              fullWidth 
-              justify="start"
-              leftSection={<IconBrandDocker size={18} />}
-              onClick={() => window.open('https://github.com/ayastreb/bandwidth-hero-proxy#installation', '_blank')}
-            >
-              Self-hosted (Docker / Manual)
-            </Button>
-          </Stack>
-        </Box>
-      </Stack>
-    </Box>
+        {/* Install Guide + Donate */}
+        <div className="grid grid-cols-2 gap-3 pt-2">
+          <button
+            onClick={() => window.open('https://github.com/ayastreb/bandwidth-hero-proxy#installation', '_blank')}
+            className={`p-3 bg-brut-red text-black border-[3px] border-black font-black uppercase text-[11px] cursor-pointer shadow-[4px_4px_0_0_#000] flex flex-col items-center justify-center gap-1 ${brutalHover}`}
+          >
+            <ExternalLink size={20} strokeWidth={3} />
+            <span>Install Guide</span>
+          </button>
+          <button
+            onClick={() => window.open('https://www.paypal.me/ayastreb', '_blank')}
+            className={`p-3 bg-brut-teal text-black border-[3px] border-black font-black uppercase text-[11px] cursor-pointer shadow-[4px_4px_0_0_#000] flex flex-col items-center justify-center gap-1 ${brutalHover}`}
+          >
+            <Heart size={20} strokeWidth={3} />
+            <span>Donate</span>
+          </button>
+        </div>
+      </div>
+    </div>
   )
 }

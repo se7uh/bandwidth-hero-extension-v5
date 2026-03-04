@@ -1,14 +1,14 @@
 import React from 'react'
 import { createRoot } from 'react-dom/client'
-import { HashRouter as Router, Route, Switch as RouterSwitch, withRouter, RouteComponentProps } from 'react-router-dom'
-import { MantineProvider, Tabs, Box, Group } from '@mantine/core'
-import { IconHome, IconWorld } from '@tabler/icons-react'
-import '@mantine/core/styles.css'
+import { Home as HomeIcon, Globe, Settings as SettingsIcon } from 'lucide-react'
+import '../index.css'
 import Header from '../components/Header'
 import Home from '../components/Home'
 import Settings from '../components/Settings'
 import parseUrl from '../utils/parseUrl'
 import defaults from '../defaults'
+
+type ActiveTab = 'home' | 'sites' | 'settings'
 
 interface PopupState {
   enabled: boolean
@@ -22,29 +22,22 @@ interface PopupState {
   compressionLevel: number
   isWebpSupported: boolean
   proxyUrl: string
-  colorScheme: 'light' | 'dark'
+  activeTab: ActiveTab
 }
 
-interface PopupProps extends RouteComponentProps {
-  currentUrl: string
-}
 
-class Popup extends React.Component<PopupProps, PopupState> {
-  constructor(props: PopupProps) {
+class Popup extends React.Component<{ currentUrl: string }, PopupState> {
+  constructor(props: { currentUrl: string }) {
     super(props)
     this.state = {
       enabled: true,
-      statistics: {
-        filesProcessed: 0,
-        bytesProcessed: 0,
-        bytesSaved: 0
-      },
+      statistics: { filesProcessed: 0, bytesProcessed: 0, bytesSaved: 0 },
       disabledHosts: [],
       convertBw: false,
       compressionLevel: 40,
       isWebpSupported: true,
       proxyUrl: '',
-      colorScheme: 'light'
+      activeTab: 'home',
     }
   }
 
@@ -58,10 +51,8 @@ class Popup extends React.Component<PopupProps, PopupState> {
         compressionLevel: stored.compressionLevel ?? defaults.compressionLevel,
         isWebpSupported: stored.isWebpSupported ?? true,
         proxyUrl: stored.proxyUrl ?? defaults.proxyUrl,
-        colorScheme: stored.colorScheme ?? 'light'
       })
     })
-
     chrome.storage.onChanged.addListener(this.stateWasUpdatedFromBackground)
   }
 
@@ -96,9 +87,9 @@ class Popup extends React.Component<PopupProps, PopupState> {
   }
 
   disabledHostsWasChanged = (value: string) => {
-    const disabledHosts = value.split('\n').map(h => h.trim()).filter(host => host !== '');
-    chrome.storage.local.set({ disabledHosts });
-    this.setState({ disabledHosts });
+    const disabledHosts = value.split('\n').map(h => h.trim()).filter(host => host !== '')
+    chrome.storage.local.set({ disabledHosts })
+    this.setState({ disabledHosts })
   }
 
   convertBwWasChanged = () => {
@@ -110,10 +101,8 @@ class Popup extends React.Component<PopupProps, PopupState> {
   }
 
   compressionLevelWasChanged = (value: number) => {
-    this.setState(() => {
-      chrome.storage.local.set({ compressionLevel: value })
-      return { compressionLevel: value }
-    })
+    chrome.storage.local.set({ compressionLevel: value })
+    this.setState({ compressionLevel: value })
   }
 
   proxyUrlWasChanged = (proxyUrl: string) => {
@@ -131,153 +120,88 @@ class Popup extends React.Component<PopupProps, PopupState> {
   }
 
   render() {
-    const { history, location } = this.props;
-    const isHome = location.pathname === '/';
-    const isSites = location.pathname === '/sites';
+    const { activeTab } = this.state
 
     return (
-      <MantineProvider forceColorScheme="light" theme={{ primaryColor: 'blue' }}>
-        <Box style={{ width: '400px', minHeight: '450px', backgroundColor: 'white', display: 'flex', flexDirection: 'column' }}>
-          <RouterSwitch>
-            <Route path="/settings">
-              <Settings 
-                proxyUrl={this.state.proxyUrl} 
-                onChange={this.proxyUrlWasChanged}
-                onBack={() => history.push('/')}
-              />
-            </Route>
-            <Route path="*">
-              <Box style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                <Box bg="#2b69e3" pt="sm">
-                  <Header 
-                    enabled={this.state.enabled} 
-                    onChange={this.enableSwitchWasChanged}
-                    pt="md"
-                  />
-                  <Tabs 
-                    value={isSites ? 'sites' : 'home'} 
-                    onChange={(val) => history.push(val === 'home' ? '/' : '/sites')}
-                    variant="unstyled"
-                    styles={{
-                      root: { display: 'flex', flexDirection: 'column' },
-                      list: {
-                        display: 'flex',
-                        padding: '0 12px',
-                        backgroundColor: '#2b69e3',
-                        borderBottom: 0,
-                        gap: '8px',
-                        marginTop: '5px',
-                      }
-                    }}
-                  >
-                    <Tabs.List grow>
-                      <Tabs.Tab 
-                        value="home" 
-                        style={{
-                          flex: 1,
-                          backgroundColor: !isSites ? 'white' : 'rgba(0, 0, 0, 0.2)',
-                          color: !isSites ? '#2b69e3' : 'white',
-                          padding: '8px 24px',
-                          fontWeight: 700,
-                          fontSize: '14px',
-                          borderRadius: '8px 8px 0 0',
-                          border: 0,
-                          cursor: 'pointer',
-                          display: 'flex',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          marginBottom: '-1px',
-                        }}
-                      >
-                        <Group gap={4} align="center" justify="center" style={{ height: '100%' }}>
-                          <IconHome size={18} style={{ display: 'block' }} />
-                          <span style={{ lineHeight: 1 }}>Home</span>
-                        </Group>
-                      </Tabs.Tab>
-                      <Tabs.Tab 
-                        value="sites" 
-                        style={{
-                          flex: 1,
-                          backgroundColor: isSites ? 'white' : 'rgba(0, 0, 0, 0.2)',
-                          color: isSites ? '#2b69e3' : 'white',
-                          padding: '8px 24px',
-                          fontWeight: 700,
-                          fontSize: '14px',
-                          borderRadius: '8px 8px 0 0',
-                          border: 0,
-                          cursor: 'pointer',
-                          display: 'flex',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          marginBottom: '-1px',
-                        }}
-                      >
-                        <Group gap={4} align="center" justify="center" style={{ height: '100%' }}>
-                          <IconWorld size={18} style={{ display: 'block' }} />
-                          <span style={{ lineHeight: 1 }}>Sites</span>
-                        </Group>
-                      </Tabs.Tab>
-                    </Tabs.List>
-                  </Tabs>
-                </Box>
+      <div className="w-[380px] min-h-[460px] bg-brut-yellow flex flex-col outline outline-[3px] outline-black">
+        {/* Header */}
+        <Header enabled={this.state.enabled} onChange={this.enableSwitchWasChanged} />
 
-                <Box bg="white" p="xs" style={{ flex: 1 }}>
-                  <RouterSwitch>
-                    <Route exact path="/">
-                      <Home
-                        statistics={this.state.statistics}
-                        disabledHosts={this.state.disabledHosts}
-                        currentUrl={this.props.currentUrl}
-                        compressionLevel={this.state.compressionLevel}
-                        convertBw={this.state.convertBw}
-                        proxyUrl={this.state.proxyUrl}
-                        onSiteDisable={this.siteWasDisabled}
-                        onSiteEnable={this.siteWasEnabled}
-                        compressionLevelOnChange={this.compressionLevelWasChanged}
-                        convertBwOnChange={this.convertBwWasChanged}
-                        onConfigureProxy={() => history.push('/settings')}
-                      />
-                    </Route>
-                    <Route path="/sites">
-                      <Home
-                        view="sites"
-                        statistics={this.state.statistics}
-                        disabledHosts={this.state.disabledHosts}
-                        currentUrl={this.props.currentUrl}
-                        compressionLevel={this.state.compressionLevel}
-                        convertBw={this.state.convertBw}
-                        proxyUrl={this.state.proxyUrl}
-                        onSiteDisable={this.siteWasDisabled}
-                        onSiteEnable={this.siteWasEnabled}
-                        disabledOnChange={this.disabledHostsWasChanged}
-                        compressionLevelOnChange={this.compressionLevelWasChanged}
-                        convertBwOnChange={this.convertBwWasChanged}
-                        onConfigureProxy={() => history.push('/settings')}
-                      />
-                    </Route>
-                  </RouterSwitch>
-                </Box>
-              </Box>
-            </Route>
-          </RouterSwitch>
-        </Box>
-      </MantineProvider>
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto p-4 bg-brut-yellow">
+          {activeTab === 'home' && (
+            <Home
+              view="home"
+              statistics={this.state.statistics}
+              disabledHosts={this.state.disabledHosts}
+              currentUrl={this.props.currentUrl}
+              compressionLevel={this.state.compressionLevel}
+              convertBw={this.state.convertBw}
+              proxyUrl={this.state.proxyUrl}
+              onSiteDisable={this.siteWasDisabled}
+              onSiteEnable={this.siteWasEnabled}
+              compressionLevelOnChange={this.compressionLevelWasChanged}
+              convertBwOnChange={this.convertBwWasChanged}
+              onConfigureProxy={() => this.setState({ activeTab: 'settings' })}
+            />
+          )}
+          {activeTab === 'sites' && (
+            <Home
+              view="sites"
+              statistics={this.state.statistics}
+              disabledHosts={this.state.disabledHosts}
+              currentUrl={this.props.currentUrl}
+              compressionLevel={this.state.compressionLevel}
+              convertBw={this.state.convertBw}
+              proxyUrl={this.state.proxyUrl}
+              onSiteDisable={this.siteWasDisabled}
+              onSiteEnable={this.siteWasEnabled}
+              disabledOnChange={this.disabledHostsWasChanged}
+              compressionLevelOnChange={this.compressionLevelWasChanged}
+              convertBwOnChange={this.convertBwWasChanged}
+              onConfigureProxy={() => this.setState({ activeTab: 'settings' })}
+            />
+          )}
+          {activeTab === 'settings' && (
+            <Settings
+              proxyUrl={this.state.proxyUrl}
+              onChange={this.proxyUrlWasChanged}
+              onBack={() => this.setState({ activeTab: 'home' })}
+            />
+          )}
+        </div>
+
+        {/* Tab bar */}
+        <div className="flex border-t-[3px] border-black bg-white">
+          <button
+            onClick={() => this.setState({ activeTab: 'home' })}
+            className={`flex-1 p-4 flex justify-center items-center border-none border-r-[3px] border-black cursor-pointer ${activeTab === 'home' ? 'bg-brut-cyan' : 'bg-white'}`}
+          >
+            <HomeIcon size={24} strokeWidth={3} />
+          </button>
+          <button
+            onClick={() => this.setState({ activeTab: 'sites' })}
+            className={`flex-1 p-4 flex justify-center items-center border-none border-r-[3px] border-black cursor-pointer ${activeTab === 'sites' ? 'bg-brut-cyan' : 'bg-white'}`}
+          >
+            <Globe size={24} strokeWidth={3} />
+          </button>
+          <button
+            onClick={() => this.setState({ activeTab: 'settings' })}
+            className={`flex-1 p-4 flex justify-center items-center border-none cursor-pointer ${activeTab === 'settings' ? 'bg-brut-cyan' : 'bg-white'}`}
+          >
+            <SettingsIcon size={24} strokeWidth={3} />
+          </button>
+        </div>
+      </div>
     )
   }
 }
 
-const PopupWithRouter = withRouter(Popup);
-
 chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
   const currentUrl = tabs[0]?.url || ''
-  
   const container = document.getElementById('root')
   if (container) {
     const root = createRoot(container)
-    root.render(
-      <Router>
-        <PopupWithRouter currentUrl={currentUrl} />
-      </Router>
-    )
+    root.render(<Popup currentUrl={currentUrl} />)
   }
 })
