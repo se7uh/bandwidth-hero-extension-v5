@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { ExternalLink, Heart } from 'lucide-react'
+import { ExternalLink, Heart, CheckCircle, XCircle, Loader } from 'lucide-react'
 import debounce from 'lodash/debounce'
 import { brutalHover } from './styles'
 
@@ -9,38 +9,85 @@ interface SettingsProps {
   onBack: () => void
 }
 
-type SaveStatus = 'saved' | 'saving'
+type CheckStatus = 'idle' | 'checking' | 'ok' | 'error'
 
 export default ({ proxyUrl, onChange, onBack }: SettingsProps) => {
   const [value, setValue] = useState(proxyUrl)
-  const [status, setStatus] = useState<SaveStatus>('saved')
+  const [checkStatus, setCheckStatus] = useState<CheckStatus>('idle')
+  const [checkError, setCheckError] = useState<string>('')
 
-  const debouncedOnChange = useCallback(
-    debounce((newValue: string) => {
-      onChange(newValue)
-      setStatus('saved')
+  const debouncedCheck = useCallback(
+    debounce(async (url: string) => {
+      const trimmed = url.trim()
+      if (!trimmed) {
+        setCheckStatus('idle')
+        return
+      }
+
+      setCheckStatus('checking')
+      setCheckError('')
+
+      try {
+        const testImage = 'https://picsum.photos/id/1/100/100'
+        const cleanProxy = trimmed.replace(/\/$/, '')
+        const testUrl = `${cleanProxy}?url=${encodeURIComponent(testImage)}&l=40&jpeg=0&avif=0&bw=0`
+
+        const response = await fetch(testUrl, { signal: AbortSignal.timeout(8000) })
+
+        if (!response.ok) {
+          setCheckStatus('error')
+          setCheckError(`Server returned ${response.status} ${response.statusText}`)
+          return
+        }
+
+        const hasOriginalSize = response.headers.has('x-original-size')
+        const hasBytesSaved = response.headers.has('x-bytes-saved')
+
+        if (hasOriginalSize || hasBytesSaved) {
+          setCheckStatus('ok')
+        } else {
+          setCheckStatus('error')
+          setCheckError('URL reachable but does not appear to be a Bandwidth Hero proxy')
+        }
+      } catch (err: any) {
+        setCheckStatus('error')
+        if (err.name === 'TimeoutError') {
+          setCheckError('Connection timed out')
+        } else {
+          setCheckError(err.message ?? 'Could not reach proxy')
+        }
+      }
     }, 1000),
-    [onChange]
+    []
   )
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = event.currentTarget.value
     setValue(newValue)
-    setStatus('saving')
-    debouncedOnChange(newValue)
+    setCheckStatus(newValue.trim() ? 'checking' : 'idle')
+    debouncedCheck(newValue)
   }
 
   const handleSave = () => {
-    debouncedOnChange.cancel()
+    debouncedCheck.cancel()
     onChange(value)
-    setStatus('saved')
   }
 
   useEffect(() => {
-    if (proxyUrl !== value && status === 'saved') {
-      setValue(proxyUrl)
-    }
-  }, [proxyUrl, status, value])
+    return () => { debouncedCheck.cancel() }
+  }, [debouncedCheck])
+
+  const checkIcon = checkStatus === 'ok'
+    ? <CheckCircle size={16} strokeWidth={3} />
+    : checkStatus === 'error'
+    ? <XCircle size={16} strokeWidth={3} />
+    : null
+
+  const checkBg = checkStatus === 'ok'
+    ? 'bg-brut-teal'
+    : checkStatus === 'error'
+    ? 'bg-brut-red'
+    : 'bg-white'
 
   return (
     <div className="flex flex-col gap-6">
@@ -49,17 +96,37 @@ export default ({ proxyUrl, onChange, onBack }: SettingsProps) => {
         <label className={`font-black text-[17px] uppercase bg-white border-[3px] border-black px-2 py-0.5 inline-block shadow-[4px_4px_0_0_#000] ${brutalHover}`}>
           Proxy URL
         </label>
-        <input
-          type="text"
-          value={value}
-          onChange={handleInputChange}
-          placeholder="https://bh.psht.me/api/index"
-          className={`w-full border-[3px] border-black p-3 font-mono font-bold text-[13px] shadow-[4px_4px_0_0_#000] outline-none bg-white box-border ${brutalHover} focus:translate-x-[2px] focus:translate-y-[2px] focus:shadow-[2px_2px_0_0_#000]`}
-        />
+        <div className="relative">
+          <input
+            type="url"
+            value={value}
+            onChange={handleInputChange}
+            spellCheck={false}
+            autoComplete="off"
+            className={`w-full border-[3px] border-black p-3 pr-10 font-mono font-bold text-[13px] shadow-[4px_4px_0_0_#000] outline-none bg-white box-border ${brutalHover} focus:translate-x-[2px] focus:translate-y-[2px] focus:shadow-[2px_2px_0_0_#000]`}
+          />
+          {checkStatus === 'checking' && (
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none z-10">
+              <Loader size={16} strokeWidth={3} className="animate-spin" />
+            </span>
+          )}
+        </div>
+
+        {/* Check status */}
+        {checkStatus !== 'idle' && (
+          <div className={`flex items-center gap-2 border-[3px] border-black px-3 py-2 font-bold text-[12px] ${checkBg}`}>
+            {checkIcon}
+            <span>
+              {checkStatus === 'checking' && 'Checking proxy…'}
+              {checkStatus === 'ok' && 'Proxy is reachable'}
+              {checkStatus === 'error' && (checkError || 'Proxy unreachable')}
+            </span>
+          </div>
+        )}
       </div>
 
       <div className="flex flex-col gap-3 pt-2">
-        {/* Save Config */}
+        {/* Save */}
         <button
           onClick={handleSave}
           className={`w-full p-3 bg-black text-white border-[3px] border-black font-black uppercase text-[17px] cursor-pointer shadow-[4px_4px_0_0_#000] ${brutalHover}`}
