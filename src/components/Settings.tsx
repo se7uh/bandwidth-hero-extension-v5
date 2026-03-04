@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { Stack, Box, Group, Text, Title, TextInput, Button, Divider, ActionIcon, Loader } from '@mantine/core'
-import { IconArrowLeft, IconWorld, IconBrandDocker, IconCheck, IconAlertCircle, IconSettings } from '@tabler/icons-react'
+import { ExternalLink, Heart } from 'lucide-react'
 import debounce from 'lodash/debounce'
 
 interface SettingsProps {
@@ -11,11 +10,19 @@ interface SettingsProps {
 
 type SaveStatus = 'saved' | 'saving'
 
+const hoverIn = (e: React.MouseEvent<HTMLButtonElement>) => {
+  e.currentTarget.style.transform = 'translate(2px,2px)'
+  e.currentTarget.style.boxShadow = 'var(--brut-shadow-sm)'
+}
+const hoverOut = (e: React.MouseEvent<HTMLButtonElement>) => {
+  e.currentTarget.style.transform = ''
+  e.currentTarget.style.boxShadow = 'var(--brut-shadow)'
+}
+
 export default ({ proxyUrl, onChange, onBack }: SettingsProps) => {
   const [value, setValue] = useState(proxyUrl)
   const [status, setStatus] = useState<SaveStatus>('saved')
 
-  // Create a debounced version of the onChange function
   const debouncedOnChange = useCallback(
     debounce((newValue: string) => {
       onChange(newValue)
@@ -31,7 +38,12 @@ export default ({ proxyUrl, onChange, onBack }: SettingsProps) => {
     debouncedOnChange(newValue)
   }
 
-  // Update local state if proxyUrl prop changes
+  const handleSave = () => {
+    debouncedOnChange.cancel()
+    onChange(value)
+    setStatus('saved')
+  }
+
   useEffect(() => {
     if (proxyUrl !== value && status === 'saved') {
       setValue(proxyUrl)
@@ -39,69 +51,54 @@ export default ({ proxyUrl, onChange, onBack }: SettingsProps) => {
   }, [proxyUrl, status, value])
 
   return (
-    <Box style={{ display: 'flex', flexDirection: 'column' }}>
-      <Box p="md" bg="#2b69e3" style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-        <Group justify="space-between" align="center">
-          <Group gap="xs">
-            <ActionIcon variant="transparent" onClick={onBack} color="white">
-              <IconArrowLeft size={20} />
-            </ActionIcon>
-            <IconSettings size={20} color="white" />
-            <Title order={3} size="20px" c="white">Settings</Title>
-          </Group>
-          
-          <Group gap={4}>
-            {status === 'saving' && (
-              <>
-                <Loader size={12} color="white" />
-                <Text size="xs" c="white" fw={500} style={{ opacity: 0.9 }}>Saving...</Text>
-              </>
-            )}
-            {status === 'saved' && value && (
-              <>
-                <IconCheck size={12} color="white" />
-                <Text size="xs" c="white" fw={500} style={{ opacity: 0.9 }}>Saved</Text>
-              </>
-            )}
-          </Group>
-        </Group>
-      </Box>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+      {/* Proxy URL */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        <label style={{ fontWeight: 900, fontSize: '17px', textTransform: 'uppercase', background: 'var(--brut-white)', border: 'var(--brut-border)', padding: '2px 8px', display: 'inline-block', boxShadow: 'var(--brut-shadow)' }}>
+          Proxy URL
+        </label>
+        <input
+          type="text"
+          value={value}
+          onChange={handleInputChange}
+          placeholder="https://bh.psht.me/api/index"
+          style={{ width: '100%', border: 'var(--brut-border)', padding: '12px', fontFamily: 'monospace', fontWeight: 700, fontSize: '13px', boxShadow: 'var(--brut-shadow)', outline: 'none', boxSizing: 'border-box', background: 'var(--brut-white)', transition: 'transform 0.1s, box-shadow 0.1s' }}
+          onFocus={e => { e.currentTarget.style.transform = 'translate(2px,2px)'; e.currentTarget.style.boxShadow = 'var(--brut-shadow-sm)' }}
+          onBlur={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = 'var(--brut-shadow)' }}
+        />
+      </div>
 
-      <Stack p="md" gap="lg">
-        <Box>
-          <Group gap="xs" mb={5}>
-            <IconWorld size={18} color="#2b69e3" />
-            <Text size="sm" fw={700}>Proxy URL</Text>
-          </Group>
-          <Text size="xs" c="dimmed" mb={5}>
-            Enter the URL of your self-hosted compression instance.
-          </Text>
-          <TextInput
-            value={value}
-            onChange={handleInputChange}
-            placeholder="https://your-proxy.com"
-            size="md"
-          />
-        </Box>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', paddingTop: '8px' }}>
+        {/* Save Config */}
+        <button
+          onClick={handleSave}
+          style={{ width: '100%', padding: '12px', background: 'var(--brut-black)', color: 'var(--brut-white)', border: '3px solid transparent', fontWeight: 900, textTransform: 'uppercase', fontSize: '17px', cursor: 'pointer', boxShadow: '4px 4px 0 0 #fff', transition: 'all 0.1s' }}
+          onMouseEnter={e => { e.currentTarget.style.background = 'var(--brut-white)'; e.currentTarget.style.color = 'var(--brut-black)'; e.currentTarget.style.borderColor = 'var(--brut-black)'; e.currentTarget.style.boxShadow = 'var(--brut-shadow)' }}
+          onMouseLeave={e => { e.currentTarget.style.background = 'var(--brut-black)'; e.currentTarget.style.color = 'var(--brut-white)'; e.currentTarget.style.borderColor = 'transparent'; e.currentTarget.style.boxShadow = '4px 4px 0 0 #fff' }}
+        >
+          Save Config
+        </button>
 
-        <Divider />
-
-        <Box>
-          <Text size="xs" fw={700} c="dimmed" mb="sm">INSTALLATION GUIDES</Text>
-          <Stack gap="xs">
-            <Button 
-              variant="outline" 
-              color="gray" 
-              fullWidth 
-              justify="start"
-              leftSection={<IconBrandDocker size={18} />}
-              onClick={() => window.open('https://github.com/ayastreb/bandwidth-hero-proxy#installation', '_blank')}
-            >
-              Self-hosted (Docker / Manual)
-            </Button>
-          </Stack>
-        </Box>
-      </Stack>
-    </Box>
+        {/* Install Guide + Donate */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', paddingTop: '8px' }}>
+          <button
+            onClick={() => window.open('https://github.com/ayastreb/bandwidth-hero-proxy#installation', '_blank')}
+            style={{ padding: '12px', background: 'var(--brut-red)', color: 'var(--brut-black)', border: 'var(--brut-border)', fontWeight: 900, textTransform: 'uppercase', fontSize: '11px', cursor: 'pointer', boxShadow: 'var(--brut-shadow)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px', transition: 'transform 0.1s, box-shadow 0.1s' }}
+            onMouseEnter={hoverIn} onMouseLeave={hoverOut}
+          >
+            <ExternalLink size={20} strokeWidth={3} />
+            <span>Install Guide</span>
+          </button>
+          <button
+            onClick={() => window.open('https://www.paypal.me/ayastreb', '_blank')}
+            style={{ padding: '12px', background: 'var(--brut-teal)', color: 'var(--brut-black)', border: 'var(--brut-border)', fontWeight: 900, textTransform: 'uppercase', fontSize: '11px', cursor: 'pointer', boxShadow: 'var(--brut-shadow)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px', transition: 'transform 0.1s, box-shadow 0.1s' }}
+            onMouseEnter={hoverIn} onMouseLeave={hoverOut}
+          >
+            <Heart size={20} strokeWidth={3} />
+            <span>Donate</span>
+          </button>
+        </div>
+      </div>
+    </div>
   )
 }

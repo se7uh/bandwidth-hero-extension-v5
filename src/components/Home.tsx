@@ -3,8 +3,6 @@ import UsageStatistics from './UsageStatistics'
 import DisableButton from './DisableButton'
 import CompressionSettings from './CompressionSettings'
 import ManageDisabled from './ManageDisabled'
-import { Stack, Divider, Alert } from '@mantine/core'
-import { IconInfoCircle } from '@tabler/icons-react'
 
 interface HomeProps {
   view?: 'home' | 'sites'
@@ -39,57 +37,41 @@ export default ({
   disabledOnChange,
   compressionLevelOnChange,
   convertBwOnChange,
-  onConfigureProxy
 }: HomeProps) => {
   if (view === 'sites') {
     return (
-      <ManageDisabled 
-        disabledHosts={disabledHosts} 
-        onChange={disabledOnChange!} 
+      <ManageDisabled
+        disabledHosts={disabledHosts}
+        onChange={disabledOnChange!}
       />
     )
   }
 
   return (
-    <Stack gap="xs">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
       {!proxyUrl && (
-        <Alert 
-          color="orange" 
-          variant="light" 
-          title="Setup Required"
-          icon={<IconInfoCircle size={16} />}
-          styles={{
-            root: { padding: '8px' },
-            title: { fontSize: '12px', marginBottom: '2px' },
-            message: { fontSize: '11px' },
-            icon: { marginRight: '8px' }
-          }}
-        >
-          Please configure your compression proxy URL to start saving data.
-        </Alert>
+        <div style={{ background: 'var(--brut-yellow)', border: 'var(--brut-border)', padding: '8px 12px', boxShadow: 'var(--brut-shadow)' }}>
+          <div style={{ fontWeight: 900, fontSize: '12px', textTransform: 'uppercase' }}>Setup Required</div>
+          <div style={{ fontSize: '11px', marginTop: '2px' }}>Please configure your compression proxy URL to start saving data.</div>
+        </div>
       )}
       <UsageStatistics
         filesProcessed={statistics.filesProcessed}
         bytesProcessed={statistics.bytesProcessed}
         bytesSaved={statistics.bytesSaved}
       />
-      
-      <Divider my={4} />
-
       <DisableButton
         disabledHosts={disabledHosts}
         currentUrl={currentUrl}
         onSiteDisable={onSiteDisable}
         onSiteEnable={onSiteEnable}
       />
-
       <CompressionSettings
         convertBw={convertBw}
         compressionLevel={compressionLevel}
         onConvertBwChange={convertBwOnChange}
         onCompressionLevelChange={compressionLevelOnChange}
-        onConfigureProxy={onConfigureProxy}
       />
-    </Stack>
+    </div>
   )
 }
