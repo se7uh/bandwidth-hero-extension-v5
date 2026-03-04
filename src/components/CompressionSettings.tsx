@@ -1,5 +1,6 @@
 import React from 'react'
 import { Check } from 'lucide-react'
+import { brutalHover } from './styles'
 
 interface CompressionSettingsProps {
   convertBw: boolean
@@ -10,7 +11,7 @@ interface CompressionSettingsProps {
 
 export default ({ convertBw, compressionLevel, onConvertBwChange, onCompressionLevelChange }: CompressionSettingsProps) => {
   return (
-    <div className="bg-brut-purple border-[3px] border-black p-4 shadow-[4px_4px_0_0_#000] flex flex-col gap-4">
+    <div className={`bg-brut-purple border-[3px] border-black p-4 shadow-[4px_4px_0_0_#000] flex flex-col gap-4 ${brutalHover}`}>
       {/* Quality slider */}
       <div className="flex flex-col gap-2">
         <div className="flex justify-between font-bold text-[13px]">
@@ -26,9 +27,9 @@ export default ({ convertBw, compressionLevel, onConvertBwChange, onCompressionL
         />
       </div>
 
-      {/* B&W mode */}
+      {/* Grayscale mode */}
       <div className="flex justify-between items-center pt-1">
-        <label className="font-bold text-[13px] uppercase">B&W Mode</label>
+        <label className="font-bold text-[13px] uppercase">Grayscale Mode</label>
         <button
           onClick={onConvertBwChange}
           className={`w-6 h-6 border-[3px] border-black cursor-pointer flex items-center justify-center p-0 ${convertBw ? 'bg-black text-white' : 'bg-white'}`}
