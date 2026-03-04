@@ -2,9 +2,9 @@
   "$schema": "https://json.schemastore.org/chrome-manifest.json",
   "chromium:manifest_version": 3,
   "firefox:manifest_version": 2,
-  "version": "3.0.0",
+  "version": "5.0.0",
   "name": "Bandwidth Hero - Live Image Compression",
-  "short_name": "Bandwidth Hero",
+  "short_name": "Bandwidth Hero v5",
   "description": "Saves data by compressing images on the page.",
   "icons": {
     "16": "images/icon.png",
@@ -73,5 +73,5 @@
   ],
   "web_accessible_resources": [
   ],
-  "author": "Anatoliy Yastreb"
+  "author": "John Thor"
 }
