@@ -8,18 +8,6 @@ interface DisableButtonProps {
   onSiteEnable?: () => void
 }
 
-const btnBase: React.CSSProperties = {
-  width: '100%',
-  padding: '10px',
-  border: 'var(--brut-border)',
-  boxShadow: 'var(--brut-shadow)',
-  fontWeight: 900,
-  fontSize: '13px',
-  textTransform: 'uppercase',
-  cursor: 'pointer',
-  transition: 'transform 0.1s, box-shadow 0.1s',
-}
-
 export default ({ disabledHosts = [], currentUrl = '', onSiteDisable, onSiteEnable }: DisableButtonProps) => {
   const { schema, hostname } = parseUrl(currentUrl)
 
@@ -29,9 +17,7 @@ export default ({ disabledHosts = [], currentUrl = '', onSiteDisable, onSiteEnab
   return (
     <button
       onClick={isDisabled ? onSiteEnable : onSiteDisable}
-      style={{ ...btnBase, background: isDisabled ? 'var(--brut-cyan)' : 'var(--brut-red)' }}
-      onMouseEnter={e => { e.currentTarget.style.transform = 'translate(2px,2px)'; e.currentTarget.style.boxShadow = 'var(--brut-shadow-sm)' }}
-      onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = 'var(--brut-shadow)' }}
+      className={`w-full py-[10px] px-3 border-[3px] border-black shadow-[4px_4px_0_0_#000] font-black text-[13px] uppercase cursor-pointer transition-[transform,box-shadow] duration-100 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0_0_#000] ${isDisabled ? 'bg-brut-cyan' : 'bg-brut-red'}`}
     >
       {isDisabled ? `Enable on ${hostname}` : `Disable on ${hostname}`}
     </button>

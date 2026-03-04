@@ -1,4 +1,16 @@
-/* Neo-brutalist theme */
+@import "tailwindcss";
+
+@theme {
+  --color-brut-yellow: #FFDE59;
+  --color-brut-cyan: #5DE2E7;
+  --color-brut-purple: #CB6CE6;
+  --color-brut-red: #FF6B6B;
+  --color-brut-teal: #4ECDC4;
+  --color-brut-black: #000;
+  --color-brut-white: #fff;
+}
+
+/* Legacy CSS vars — used by range inputs and scrollbar styles */
 :root {
   --brut-yellow: #FFDE59;
   --brut-cyan: #5DE2E7;
