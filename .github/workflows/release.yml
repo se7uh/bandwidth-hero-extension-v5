@@ -1,0 +1,85 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - name: Check version consistency
+        id: version
+        run: |
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          MANIFEST_VERSION=$(node -p "require('./src/manifest.json').version")
+
+          echo "package.json version: $PKG_VERSION"
+          echo "manifest.json version: $MANIFEST_VERSION"
+
+          if [ "$PKG_VERSION" != "$MANIFEST_VERSION" ]; then
+            echo "ERROR: Version mismatch — package.json ($PKG_VERSION) != manifest.json ($MANIFEST_VERSION)"
+            exit 1
+          fi
+
+          echo "version=$PKG_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Chromium
+        run: pnpm run build
+
+      - name: Build Firefox
+        run: pnpm exec extension build --browser=firefox
+
+      - name: Zip Chromium build
+        run: |
+          cd dist/chromium
+          zip -r ../../bandwidth-hero-chromium-v${{ steps.version.outputs.version }}.zip .
+
+      - name: Zip Firefox build
+        run: |
+          cd dist/firefox
+          zip -r ../../bandwidth-hero-firefox-v${{ steps.version.outputs.version }}.zip .
+
+      - name: Upload Chromium artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bandwidth-hero-chromium-v${{ steps.version.outputs.version }}
+          path: bandwidth-hero-chromium-v${{ steps.version.outputs.version }}.zip
+
+      - name: Upload Firefox artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bandwidth-hero-firefox-v${{ steps.version.outputs.version }}
+          path: bandwidth-hero-firefox-v${{ steps.version.outputs.version }}.zip
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          name: v${{ steps.version.outputs.version }}
+          generate_release_notes: true
+          files: |
+            bandwidth-hero-chromium-v${{ steps.version.outputs.version }}.zip
+            bandwidth-hero-firefox-v${{ steps.version.outputs.version }}.zip
