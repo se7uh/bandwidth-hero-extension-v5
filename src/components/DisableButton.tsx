@@ -1,5 +1,5 @@
 import React from 'react'
-import parseUrl from '../utils/parseUrl.js'
+import parseUrl from '../utils/parseUrl'
 
 interface DisableButtonProps {
   disabledHosts?: string[]
