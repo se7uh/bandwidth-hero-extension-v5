@@ -1,77 +1,68 @@
 {
-  "$schema": "https://json.schemastore.org/chrome-manifest.json",
-  "chromium:manifest_version": 3,
-  "firefox:manifest_version": 2,
-  "version": "5.0.0",
-  "name": "Bandwidth Hero - Live Image Compression",
-  "short_name": "Bandwidth Hero v5",
-  "description": "Saves data by compressing images on the page.",
-  "icons": {
-    "16": "images/icon.png",
-    "32": "images/icon.png",
-    "48": "images/icon.png",
-    "64": "images/icon.png",
-    "128": "images/icon-256.png"
-  },
-  "chromium:action": {
-    "default_icon": {
-      "16": "images/icon.png",
-      "32": "images/icon.png",
-      "48": "images/icon.png",
-      "64": "images/icon.png",
-      "128": "images/icon-256.png"
-    },
-    "default_title": "Bandwidth Hero",
-    "default_popup": "popup/index.html"
-  },
-  "firefox:browser_action": {
-    "default_icon": {
-      "16": "images/icon.png",
-      "32": "images/icon.png",
-      "48": "images/icon.png",
-      "64": "images/icon.png",
-      "128": "images/icon-256.png"
-    },
-    "default_title": "Bandwidth Hero",
-    "default_popup": "popup/index.html"
-  },
-  "chromium:permissions": [
-    "activeTab",
-    "tabs",
-    "storage",
-    "declarativeNetRequest",
-    "declarativeNetRequestWithHostAccess"
-  ],
-  "firefox:permissions": [
-    "activeTab",
-    "tabs",
-    "storage",
-    "webRequest",
-    "webRequestBlocking",
-    "<all_urls>"
-  ],
-  "chromium:host_permissions": [
-    "<all_urls>"
-  ],
-  "background": {
-    "chromium:service_worker": "background.ts",
-    "firefox:scripts": [
-      "background.ts"
-    ]
-  },
-  "content_scripts": [
-    {
-      "matches": [
-        "<all_urls>"
-      ],
-      "js": [
-        "content/scripts.ts"
-      ],
-      "all_frames": true,
-      "run_at": "document_start"
-    }
-  ],
-  "web_accessible_resources": [
-  ],
-  "author": "John Thor"
+	"$schema": "https://json.schemastore.org/chrome-manifest.json",
+	"chromium:manifest_version": 3,
+	"firefox:manifest_version": 2,
+	"version": "5.0.0",
+	"name": "Bandwidth Hero - Live Image Compression",
+	"short_name": "Bandwidth Hero v5",
+	"description": "Saves data by compressing images on the page.",
+	"icons": {
+		"16": "images/icon.png",
+		"32": "images/icon.png",
+		"48": "images/icon.png",
+		"64": "images/icon.png",
+		"128": "images/icon-256.png"
+	},
+	"chromium:action": {
+		"default_icon": {
+			"16": "images/icon.png",
+			"32": "images/icon.png",
+			"48": "images/icon.png",
+			"64": "images/icon.png",
+			"128": "images/icon-256.png"
+		},
+		"default_title": "Bandwidth Hero",
+		"default_popup": "popup/index.html"
+	},
+	"firefox:browser_action": {
+		"default_icon": {
+			"16": "images/icon.png",
+			"32": "images/icon.png",
+			"48": "images/icon.png",
+			"64": "images/icon.png",
+			"128": "images/icon-256.png"
+		},
+		"default_title": "Bandwidth Hero",
+		"default_popup": "popup/index.html"
+	},
+	"chromium:permissions": [
+		"activeTab",
+		"tabs",
+		"storage",
+		"declarativeNetRequest",
+		"declarativeNetRequestWithHostAccess"
+	],
+	"firefox:permissions": [
+		"activeTab",
+		"tabs",
+		"storage",
+		"webRequest",
+		"webRequestBlocking",
+		"<all_urls>"
+	],
+	"chromium:host_permissions": ["<all_urls>"],
+	"background": {
+		"chromium:service_worker": "background.ts",
+		"firefox:scripts": ["background.ts"]
+	},
+	"content_scripts": [
+		{
+			"matches": ["<all_urls>"],
+			"js": ["content/scripts.ts"],
+			"all_frames": true,
+			"run_at": "document_start"
+		}
+	],
+	"web_accessible_resources": [],
+	"author": "John Thor"
 }
