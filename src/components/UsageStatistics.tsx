@@ -22,22 +22,22 @@ export default ({
 	return (
 		<div className="grid grid-cols-2 gap-3">
 			<div
-				className={`bg-white border-[3px] border-black p-3 shadow-[4px_4px_0_0_#000] ${brutalHover}`}
+				className={`border-[3px] border-black bg-white p-3 shadow-[4px_4px_0_0_#000] ${brutalHover}`}
 			>
-				<div className="text-[28px] font-black leading-none">
+				<div className="font-black text-[28px] leading-none">
 					{formatBytes(bytesSaved)}
 				</div>
-				<div className="font-bold text-[10px] uppercase bg-black text-white inline-block px-1 mt-1">
+				<div className="mt-1 inline-block bg-black px-1 font-bold text-[10px] text-white uppercase">
 					Data Saved
 				</div>
 			</div>
 			<div
-				className={`bg-white border-[3px] border-black p-3 shadow-[4px_4px_0_0_#000] ${brutalHover}`}
+				className={`border-[3px] border-black bg-white p-3 shadow-[4px_4px_0_0_#000] ${brutalHover}`}
 			>
-				<div className="text-[28px] font-black leading-none">
+				<div className="font-black text-[28px] leading-none">
 					{filesProcessed.toLocaleString()}
 				</div>
-				<div className="font-bold text-[10px] uppercase bg-black text-white inline-block px-1 mt-1">
+				<div className="mt-1 inline-block bg-black px-1 font-bold text-[10px] text-white uppercase">
 					Images
 				</div>
 			</div>

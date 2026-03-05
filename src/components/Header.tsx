@@ -5,8 +5,8 @@ interface HeaderProps {
 
 export default ({ enabled = false, onChange }: HeaderProps) => {
 	return (
-		<div className="px-4 py-3 border-b-[3px] border-black bg-white flex justify-between items-center">
-			<h1 className="text-[20px] font-black uppercase italic tracking-tight leading-[1.1] m-0">
+		<div className="flex items-center justify-between border-black border-b-[3px] bg-white px-4 py-3">
+			<h1 className="m-0 font-black text-[20px] uppercase italic leading-[1.1] tracking-tight">
 				Bandwidth
 				<br />
 				Hero
@@ -19,10 +19,10 @@ export default ({ enabled = false, onChange }: HeaderProps) => {
 					type="button"
 					onClick={onChange}
 					aria-label={enabled ? "Disable" : "Enable"}
-					className={`w-12 h-6 border-[3px] border-black relative cursor-pointer p-0 transition-colors duration-100 ${enabled ? "bg-brut-cyan" : "bg-white"}`}
+					className={`relative h-6 w-12 cursor-pointer border-[3px] border-black p-0 transition-colors duration-100 ${enabled ? "bg-brut-cyan" : "bg-white"}`}
 				>
 					<div
-						className={`absolute top-[-3px] bottom-[-3px] w-6 bg-black transition-all duration-100 ${enabled ? "right-[-3px]" : "left-[-3px]"}`}
+						className={`absolute -top-0.75 -bottom-0.75 w-6 bg-black transition-all duration-100 ${enabled ? "-right-0.75" : "-left-0.75"}`}
 					/>
 				</button>
 			</div>

@@ -11,7 +11,9 @@ const STORAGE_KEY_STATS = "statistics"
 
 async function incrementStats(bytesProcessed: number, bytesSaved: number) {
 	const stored = await chrome.storage.local.get(STORAGE_KEY_STATS)
-	const statistics: Statistics = stored[STORAGE_KEY_STATS] ?? {
+	const statistics: Statistics = (stored[STORAGE_KEY_STATS] as
+		| Statistics
+		| undefined) ?? {
 		filesProcessed: 0,
 		bytesProcessed: 0,
 		bytesSaved: 0,
