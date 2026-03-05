@@ -56,10 +56,10 @@ export default ({
 		<div className="flex flex-col gap-4">
 			{!proxyUrl && (
 				<div
-					className={`bg-brut-yellow border-[3px] border-black px-3 py-2 shadow-[4px_4px_0_0_#000] ${brutalHover}`}
+					className={`border-[3px] border-black bg-brut-yellow px-3 py-2 shadow-[4px_4px_0_0_#000] ${brutalHover}`}
 				>
 					<div className="font-black text-[12px] uppercase">Setup Required</div>
-					<div className="text-[11px] mt-0.5">
+					<div className="mt-0.5 text-[11px]">
 						Please configure your compression proxy URL to start saving data.
 					</div>
 				</div>

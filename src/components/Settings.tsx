@@ -110,7 +110,7 @@ export default ({ proxyUrl, onChange, onBack: _onBack }: SettingsProps) => {
 			<div className="flex flex-col gap-2">
 				<label
 					htmlFor="proxy-url-input"
-					className={`font-black text-[17px] uppercase bg-white border-[3px] border-black px-2 py-0.5 inline-block shadow-[4px_4px_0_0_#000] ${brutalHover}`}
+					className={`inline-block border-[3px] border-black bg-white px-2 py-0.5 font-black text-[17px] uppercase shadow-[4px_4px_0_0_#000] ${brutalHover}`}
 				>
 					Proxy URL
 				</label>
@@ -122,10 +122,10 @@ export default ({ proxyUrl, onChange, onBack: _onBack }: SettingsProps) => {
 						onChange={handleInputChange}
 						spellCheck={false}
 						autoComplete="off"
-						className={`w-full border-[3px] border-black p-3 pr-10 font-mono font-bold text-[13px] shadow-[4px_4px_0_0_#000] outline-none bg-white box-border ${brutalHover} focus:translate-x-[2px] focus:translate-y-[2px] focus:shadow-[2px_2px_0_0_#000]`}
+						className={`box-border w-full border-[3px] border-black bg-white p-3 pr-10 font-bold font-mono text-[13px] shadow-[4px_4px_0_0_#000] outline-none ${brutalHover} focus:translate-x-0.5 focus:translate-y-0.5 focus:shadow-[2px_2px_0_0_#000]`}
 					/>
 					{checkStatus === "checking" && (
-						<span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none z-10">
+						<span className="pointer-events-none absolute top-1/2 right-3 z-10 -translate-y-1/2">
 							<Loader size={16} strokeWidth={3} className="animate-spin" />
 						</span>
 					)}
@@ -151,7 +151,7 @@ export default ({ proxyUrl, onChange, onBack: _onBack }: SettingsProps) => {
 				<button
 					type="button"
 					onClick={handleSave}
-					className={`w-full p-3 bg-black text-white border-[3px] border-black font-black uppercase text-[17px] cursor-pointer shadow-[4px_4px_0_0_#000] ${brutalHover}`}
+					className={`w-full cursor-pointer border-[3px] border-black bg-black p-3 font-black text-[17px] text-white uppercase shadow-[4px_4px_0_0_#000] ${brutalHover}`}
 				>
 					Save Config
 				</button>
@@ -166,7 +166,7 @@ export default ({ proxyUrl, onChange, onBack: _onBack }: SettingsProps) => {
 								"_blank",
 							)
 						}
-						className={`p-3 bg-brut-red text-black border-[3px] border-black font-black uppercase text-[11px] cursor-pointer shadow-[4px_4px_0_0_#000] flex flex-col items-center justify-center gap-1 ${brutalHover}`}
+						className={`flex cursor-pointer flex-col items-center justify-center gap-1 border-[3px] border-black bg-brut-red p-3 font-black text-[11px] text-black uppercase shadow-[4px_4px_0_0_#000] ${brutalHover}`}
 					>
 						<ExternalLink size={20} strokeWidth={3} />
 						<span>Install Guide</span>
@@ -176,7 +176,7 @@ export default ({ proxyUrl, onChange, onBack: _onBack }: SettingsProps) => {
 						onClick={() =>
 							window.open("https://www.paypal.me/ayastreb", "_blank")
 						}
-						className={`p-3 bg-brut-teal text-black border-[3px] border-black font-black uppercase text-[11px] cursor-pointer shadow-[4px_4px_0_0_#000] flex flex-col items-center justify-center gap-1 ${brutalHover}`}
+						className={`flex cursor-pointer flex-col items-center justify-center gap-1 border-[3px] border-black bg-brut-teal p-3 font-black text-[11px] text-black uppercase shadow-[4px_4px_0_0_#000] ${brutalHover}`}
 					>
 						<Heart size={20} strokeWidth={3} />
 						<span>Donate</span>

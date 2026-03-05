@@ -27,13 +27,13 @@ export default ({
 }: CompressionSettingsProps) => {
 	return (
 		<div
-			className={`bg-brut-purple border-[3px] border-black p-4 shadow-[4px_4px_0_0_#000] flex flex-col gap-4 ${brutalHover}`}
+			className={`flex flex-col gap-4 border-[3px] border-black bg-brut-purple p-4 shadow-[4px_4px_0_0_#000] ${brutalHover}`}
 		>
 			{/* Quality slider */}
 			<div className="flex flex-col gap-2">
 				<div className="flex justify-between font-bold text-[13px]">
 					<label htmlFor="quality-slider">QUALITY</label>
-					<span className="bg-white border-2 border-black px-1">
+					<span className="border-2 border-black bg-white px-1">
 						{compressionLevel}%
 					</span>
 				</div>
@@ -63,7 +63,7 @@ export default ({
 							type="button"
 							key={value}
 							onClick={() => onImageFormatChange(value)}
-							className={`flex-1 py-1.5 border-[3px] border-black font-black text-[12px] uppercase cursor-pointer -ml-[3px] first:ml-0 ${
+							className={`-ml-0.75 flex-1 cursor-pointer border-[3px] border-black py-1.5 font-black text-[12px] uppercase first:ml-0 ${
 								imageFormat === value
 									? "bg-black text-white"
 									: "bg-white text-black"
@@ -76,7 +76,7 @@ export default ({
 			</div>
 
 			{/* Grayscale mode */}
-			<div className="flex justify-between items-center pt-1">
+			<div className="flex items-center justify-between pt-1">
 				<label
 					className="font-bold text-[13px] uppercase"
 					htmlFor="grayscale-toggle"
@@ -87,7 +87,7 @@ export default ({
 					id="grayscale-toggle"
 					type="button"
 					onClick={onConvertBwChange}
-					className={`w-6 h-6 border-[3px] border-black cursor-pointer flex items-center justify-center p-0 ${convertBw ? "bg-black text-white" : "bg-white"}`}
+					className={`flex h-6 w-6 cursor-pointer items-center justify-center border-[3px] border-black p-0 ${convertBw ? "bg-black text-white" : "bg-white"}`}
 				>
 					{convertBw && <Check size={16} strokeWidth={4} />}
 				</button>

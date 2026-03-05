@@ -53,17 +53,17 @@ export default ({ disabledHosts = [], onChange }: ManageDisabledProps) => {
 		.filter((h) => h !== "").length
 
 	return (
-		<div className="flex flex-col gap-2 h-full">
-			<div className="flex justify-between items-start">
+		<div className="flex h-full flex-col gap-2">
+			<div className="flex items-start justify-between">
 				<div>
 					<div className="font-black text-[14px] uppercase">Disabled Sites</div>
-					<div className="text-[11px] text-[#555]">
+					<div className="text-[#555] text-[11px]">
 						One domain per line. Images won't be compressed on these sites.
 					</div>
 				</div>
 				{count > 0 && (
 					<div
-						className={`text-[10px] font-black bg-black text-white px-[7px] py-[2px] border-[3px] border-black shadow-[2px_2px_0_0_#000] whitespace-nowrap shrink-0 ml-2 ${brutalHover}`}
+						className={`ml-2 shrink-0 whitespace-nowrap border-[3px] border-black bg-black px-1.75 py-0.5 font-black text-[10px] text-white shadow-[2px_2px_0_0_#000] ${brutalHover}`}
 					>
 						{count} {count === 1 ? "site" : "sites"}
 					</div>
@@ -74,9 +74,9 @@ export default ({ disabledHosts = [], onChange }: ManageDisabledProps) => {
 				onChange={handleChange}
 				placeholder="example.com"
 				spellCheck={false}
-				className={`flex-1 border-[3px] border-black p-2 font-mono text-[12px] font-bold shadow-[4px_4px_0_0_#000] outline-none resize-none min-h-[240px] ${brutalHover} focus:translate-x-[2px] focus:translate-y-[2px] focus:shadow-[2px_2px_0_0_#000]`}
+				className={`min-h-60 flex-1 resize-none border-[3px] border-black p-2 font-bold font-mono text-[12px] shadow-[4px_4px_0_0_#000] outline-none ${brutalHover} focus:translate-x-0.5 focus:translate-y-0.5 focus:shadow-[2px_2px_0_0_#000]`}
 			/>
-			<div className="text-[11px] font-bold text-right">
+			<div className="text-right font-bold text-[11px]">
 				{status === "saving" && <SavingDots />}
 				{status === "saved" && <span className="text-green-600">✓ Saved</span>}
 				{status === "unsaved" && (

@@ -22,7 +22,7 @@ export default ({
 		<button
 			type="button"
 			onClick={isDisabled ? onSiteEnable : onSiteDisable}
-			className={`w-full py-[10px] px-3 border-[3px] border-black shadow-[4px_4px_0_0_#000] font-black text-[13px] uppercase cursor-pointer transition-[transform,box-shadow] duration-100 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0_0_#000] ${isDisabled ? "bg-brut-cyan" : "bg-brut-red"}`}
+			className={`w-full cursor-pointer border-[3px] border-black px-3 py-2.5 font-black text-[13px] uppercase shadow-[4px_4px_0_0_#000] transition-[transform,box-shadow] duration-100 hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[2px_2px_0_0_#000] ${isDisabled ? "bg-brut-cyan" : "bg-brut-red"}`}
 		>
 			{isDisabled ? `Enable on ${hostname}` : `Disable on ${hostname}`}
 		</button>
