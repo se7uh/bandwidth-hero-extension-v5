@@ -1,39 +1,40 @@
 {
-  "name": "bandwidth-hero-extension",
-  "private": true,
-  "version": "5.0.0",
-  "description": "Browser extension which saves data by compressing images on the page",
-  "license": "MIT",
-  "type": "module",
-  "author": {
-    "name": "John Thor"
-  },
-  "dependencies": {
-    "axios": "^1.13.6",
-    "is-image": "^3.1.0",
-    "lodash": "^4.17.23",
-    "lucide-react": "^0.576.0",
-    "netmask": "^2.0.2",
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4"
-  },
-  "devDependencies": {
-    "@tailwindcss/postcss": "^4.2.1",
-    "@types/chrome": "^0.1.37",
-    "@types/lodash": "^4.17.24",
-    "@types/netmask": "^2.0.6",
-    "@types/react": "^19.2.14",
-    "@types/react-dom": "^19.2.3",
-    "extension": "^3.8.9",
-    "postcss": "^8.5.8",
-    "tailwindcss": "^4.2.1",
-    "typescript": "^5.9.3"
-  },
-  "scripts": {
-    "dev": "extension dev",
-    "start": "extension start",
-    "build": "extension build",
-    "build:firefox": "extension build --browser firefox",
-    "build:edge": "extension build --browser edge"
-  }
+	"name": "bandwidth-hero-extension",
+	"private": true,
+	"version": "5.0.0",
+	"description": "Browser extension which saves data by compressing images on the page",
+	"license": "MIT",
+	"type": "module",
+	"author": {
+		"name": "John Thor"
+	},
+	"dependencies": {
+		"axios": "^1.13.6",
+		"is-image": "^3.1.0",
+		"lodash": "^4.17.23",
+		"lucide-react": "^0.576.0",
+		"netmask": "^2.0.2",
+		"react": "^19.2.4",
+		"react-dom": "^19.2.4"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.4.5",
+		"@tailwindcss/postcss": "^4.2.1",
+		"@types/chrome": "^0.1.37",
+		"@types/lodash": "^4.17.24",
+		"@types/netmask": "^2.0.6",
+		"@types/react": "^19.2.14",
+		"@types/react-dom": "^19.2.3",
+		"extension": "^3.8.9",
+		"postcss": "^8.5.8",
+		"tailwindcss": "^4.2.1",
+		"typescript": "^5.9.3"
+	},
+	"scripts": {
+		"dev": "extension dev",
+		"start": "extension start",
+		"build": "extension build",
+		"build:firefox": "extension build --browser firefox",
+		"build:edge": "extension build --browser edge"
+	}
 }
