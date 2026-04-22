@@ -19,6 +19,7 @@ interface PopupState {
 		bytesSaved: number
 	}
 	disabledHosts: string[]
+	invertBlocklist: boolean
 	convertBw: boolean
 	compressionLevel: number
 	isWebpSupported: boolean
@@ -34,6 +35,7 @@ class Popup extends React.Component<{ currentUrl: string }, PopupState> {
 			enabled: true,
 			statistics: { filesProcessed: 0, bytesProcessed: 0, bytesSaved: 0 },
 			disabledHosts: [],
+			invertBlocklist: false,
 			convertBw: false,
 			compressionLevel: 40,
 			isWebpSupported: true,
@@ -49,6 +51,7 @@ class Popup extends React.Component<{ currentUrl: string }, PopupState> {
 				enabled: stored.enabled ?? defaults.enabled,
 				statistics: stored.statistics ?? defaults.statistics,
 				disabledHosts: stored.disabledHosts ?? defaults.disabledHosts,
+				invertBlocklist: stored.invertBlocklist ?? defaults.invertBlocklist,
 				convertBw: stored.convertBw ?? defaults.convertBw,
 				compressionLevel: stored.compressionLevel ?? defaults.compressionLevel,
 				isWebpSupported: stored.isWebpSupported ?? true,
@@ -98,6 +101,14 @@ class Popup extends React.Component<{ currentUrl: string }, PopupState> {
 			.filter((host) => host !== "")
 		chrome.storage.local.set({ disabledHosts })
 		this.setState({ disabledHosts })
+	}
+
+	invertBlocklistWasChanged = () => {
+		this.setState((prevState) => {
+			const invertBlocklist = !prevState.invertBlocklist
+			chrome.storage.local.set({ invertBlocklist })
+			return { invertBlocklist }
+		})
 	}
 
 	convertBwWasChanged = () => {
@@ -165,6 +176,8 @@ class Popup extends React.Component<{ currentUrl: string }, PopupState> {
 							compressionLevelOnChange={this.compressionLevelWasChanged}
 							convertBwOnChange={this.convertBwWasChanged}
 							imageFormatOnChange={this.imageFormatWasChanged}
+							invertBlocklist={this.state.invertBlocklist}
+							onInvertBlocklistChange={this.invertBlocklistWasChanged}
 							onConfigureProxy={() => this.setState({ activeTab: "settings" })}
 						/>
 					)}
@@ -184,6 +197,8 @@ class Popup extends React.Component<{ currentUrl: string }, PopupState> {
 							compressionLevelOnChange={this.compressionLevelWasChanged}
 							convertBwOnChange={this.convertBwWasChanged}
 							imageFormatOnChange={this.imageFormatWasChanged}
+							invertBlocklist={this.state.invertBlocklist}
+							onInvertBlocklistChange={this.invertBlocklistWasChanged}
 							onConfigureProxy={() => this.setState({ activeTab: "settings" })}
 						/>
 					)}

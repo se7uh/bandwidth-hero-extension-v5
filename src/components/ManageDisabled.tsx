@@ -5,6 +5,7 @@ import { brutalHover } from "./styles"
 
 interface ManageDisabledProps {
 	disabledHosts?: string[]
+	invertBlocklist?: boolean
 	onChange?: (value: string) => void
 }
 
@@ -19,7 +20,11 @@ const SavingDots = () => {
 	return <span className="text-[#555]">Saving{".".repeat(dots)}</span>
 }
 
-export default ({ disabledHosts = [], onChange }: ManageDisabledProps) => {
+export default ({
+	disabledHosts = [],
+	invertBlocklist = false,
+	onChange,
+}: ManageDisabledProps) => {
 	const [value, setValue] = useState(
 		Array.isArray(disabledHosts) ? disabledHosts.join("\n") : "",
 	)
@@ -56,9 +61,13 @@ export default ({ disabledHosts = [], onChange }: ManageDisabledProps) => {
 		<div className="flex h-full flex-col gap-2">
 			<div className="flex items-start justify-between">
 				<div>
-					<div className="font-black text-[14px] uppercase">Disabled Sites</div>
+					<div className="font-black text-[14px] uppercase">
+						{invertBlocklist ? "Allowed Sites" : "Disabled Sites"}
+					</div>
 					<div className="text-[#555] text-[11px]">
-						One domain per line. Images won't be compressed on these sites.
+						{invertBlocklist
+							? "One domain per line. Only these sites will be compressed."
+							: "One domain per line. Images won't be compressed on these sites."}
 					</div>
 				</div>
 				{count > 0 && (

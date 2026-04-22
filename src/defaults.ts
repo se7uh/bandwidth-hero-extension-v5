@@ -10,6 +10,7 @@ export interface State {
 	enabled: boolean
 	statistics: Statistics
 	disabledHosts: string[]
+	invertBlocklist: boolean
 	convertBw: boolean
 	compressionLevel: number
 	proxyUrl: string
@@ -26,6 +27,7 @@ const defaultState: State = {
 		bytesSaved: 0,
 	},
 	disabledHosts: [],
+	invertBlocklist: false,
 	convertBw: false,
 	compressionLevel: 40,
 	proxyUrl: "",

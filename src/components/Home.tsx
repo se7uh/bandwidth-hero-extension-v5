@@ -17,6 +17,7 @@ interface HomeProps {
 	compressionLevel: number
 	convertBw: boolean
 	imageFormat: ImageFormat
+	invertBlocklist: boolean
 	proxyUrl?: string
 	onSiteDisable: () => void
 	onSiteEnable: () => void
@@ -24,6 +25,7 @@ interface HomeProps {
 	compressionLevelOnChange: (value: number) => void
 	convertBwOnChange: () => void
 	imageFormatOnChange: (format: ImageFormat) => void
+	onInvertBlocklistChange: () => void
 	onConfigureProxy: () => void
 }
 
@@ -35,6 +37,7 @@ export default ({
 	compressionLevel,
 	convertBw,
 	imageFormat,
+	invertBlocklist,
 	proxyUrl,
 	onSiteDisable,
 	onSiteEnable,
@@ -42,11 +45,13 @@ export default ({
 	compressionLevelOnChange,
 	convertBwOnChange,
 	imageFormatOnChange,
+	onInvertBlocklistChange,
 }: HomeProps) => {
 	if (view === "sites") {
 		return (
 			<ManageDisabled
 				disabledHosts={disabledHosts}
+				invertBlocklist={invertBlocklist}
 				onChange={disabledOnChange}
 			/>
 		)
@@ -71,10 +76,18 @@ export default ({
 			/>
 			<DisableButton
 				disabledHosts={disabledHosts}
+				invertBlocklist={invertBlocklist}
 				currentUrl={currentUrl}
 				onSiteDisable={onSiteDisable}
 				onSiteEnable={onSiteEnable}
 			/>
+			<button
+				type="button"
+				onClick={onInvertBlocklistChange}
+				className={`w-full cursor-pointer border-[3px] border-black px-3 py-2.5 font-black text-[13px] uppercase shadow-[4px_4px_0_0_#000] transition-[transform,box-shadow] duration-100 hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[2px_2px_0_0_#000] ${invertBlocklist ? "bg-brut-teal" : "bg-white"}`}
+			>
+				{invertBlocklist ? "Invert Blocklist: ON" : "Invert Blocklist: OFF"}
+			</button>
 			<CompressionSettings
 				convertBw={convertBw}
 				compressionLevel={compressionLevel}

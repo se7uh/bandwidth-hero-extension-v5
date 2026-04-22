@@ -23,6 +23,12 @@ const updateRedirectRules = async (state: State): Promise<void> => {
 			"localhost",
 			"127.0.0.1",
 		]
+		const listedDomains = [
+			...(state.disabledHosts || []),
+			proxyHostname,
+			"localhost",
+			"127.0.0.1",
+		]
 
 		const allowRule: chrome.declarativeNetRequest.Rule = {
 			id: 1,
@@ -49,8 +55,15 @@ const updateRedirectRules = async (state: State): Promise<void> => {
 				// Block only larger image types (skip ico, svg - already small)
 				regexFilter: "^https?://.+\\.(jpg|jpeg|png|gif|webp|bmp)(\\?.*)?$",
 				resourceTypes: [chrome.declarativeNetRequest.ResourceType.IMAGE],
-				excludedInitiatorDomains: excludedDomains,
-				excludedRequestDomains: excludedDomains,
+				...(state.invertBlocklist
+					? {
+							initiatorDomains: listedDomains,
+							requestDomains: listedDomains,
+						}
+					: {
+							excludedInitiatorDomains: excludedDomains,
+							excludedRequestDomains: excludedDomains,
+						}),
 			},
 		}
 

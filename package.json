@@ -34,6 +34,7 @@
 		"dev": "extension dev",
 		"start": "extension start",
 		"build": "extension build",
+		"lint": "biome check .",
 		"build:firefox": "extension build --browser firefox",
 		"build:edge": "extension build --browser edge"
 	}

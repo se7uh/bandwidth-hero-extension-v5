@@ -8,6 +8,7 @@ interface ShouldCompressOptions {
 	compressed: Set<string>
 	proxyUrl: string
 	disabledHosts: string[]
+	invertBlocklist?: boolean
 	enabled: boolean
 	type?: string
 }
@@ -18,6 +19,7 @@ const shouldCompress = ({
 	compressed,
 	proxyUrl,
 	disabledHosts,
+	invertBlocklist = false,
 	enabled,
 	type = "image",
 }: ShouldCompressOptions): boolean => {
@@ -76,14 +78,16 @@ const shouldCompress = ({
 		return false
 	}
 
-	// If the host of the page or image is disabled then do nothing.
-	if (disabledHosts.includes(pageUrl)) {
+	const pageHost = parseUrl(pageUrl).hostname
+	const imageHost = parseUrl(cleanImageUrl).hostname
+	const isListed =
+		disabledHosts.includes(pageHost) || disabledHosts.includes(imageHost)
+
+	if (!invertBlocklist && isListed) {
 		return false
 	}
 
-	// If the host of the page or image is disabled then do nothing.
-	const imageHost = parseUrl(cleanImageUrl).hostname
-	if (disabledHosts.includes(imageHost)) {
+	if (invertBlocklist && !isListed) {
 		return false
 	}
 

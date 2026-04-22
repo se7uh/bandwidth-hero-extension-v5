@@ -79,6 +79,7 @@ async function handleCompressImage(
 			compressed: new Set(),
 			proxyUrl: state.proxyUrl,
 			disabledHosts: state.disabledHosts,
+			invertBlocklist: state.invertBlocklist,
 			enabled: state.enabled,
 			type: "image",
 		})
@@ -155,7 +156,8 @@ chrome.storage.onChanged.addListener(async (changes, namespace) => {
 		changes.enabled ||
 		changes.convertBw ||
 		changes.compressionLevel ||
-		changes.disabledHosts
+		changes.disabledHosts ||
+		changes.invertBlocklist
 	) {
 		await updateRedirectRules(state)
 	}
