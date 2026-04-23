@@ -1,6 +1,7 @@
 import shouldCompress from "./background/shouldCompress"
 import updateRedirectRules from "./background/updateRedirectRules"
 import defaultState, { type Statistics } from "./defaults"
+import migrateLegacyRules from "./rules/migrateLegacyRules"
 import createProxyUrl from "./utils/createProxyUrl"
 
 // In Manifest V3, background scripts are Service Workers.
@@ -8,6 +9,23 @@ import createProxyUrl from "./utils/createProxyUrl"
 // then inject compressed images via content script.
 
 const STORAGE_KEY_STATS = "statistics"
+
+async function loadStateWithMigration() {
+	const stored = await chrome.storage.local.get(null)
+	const state = { ...defaultState, ...stored } as typeof defaultState
+	const migrated = migrateLegacyRules(state)
+
+	if (
+		JSON.stringify(state.rules) !== JSON.stringify(migrated.rules) ||
+		state.rulesMigrationVersion !== migrated.rulesMigrationVersion
+	) {
+		await chrome.storage.local.set(migrated)
+		state.rules = migrated.rules
+		state.rulesMigrationVersion = migrated.rulesMigrationVersion
+	}
+
+	return state
+}
 
 async function incrementStats(bytesProcessed: number, bytesSaved: number) {
 	const stored = await chrome.storage.local.get(STORAGE_KEY_STATS)
@@ -66,8 +84,7 @@ async function handleCompressImage(
 ): Promise<CompressImageResponse> {
 	try {
 		const { imageUrl, pageUrl } = request
-		const stored = await chrome.storage.local.get(null)
-		const state = { ...defaultState, ...stored } as typeof defaultState
+		const state = await loadStateWithMigration()
 
 		if (!state.enabled || !state.proxyUrl) {
 			return { success: false, reason: "disabled_or_no_proxy" }
@@ -78,8 +95,7 @@ async function handleCompressImage(
 			pageUrl,
 			compressed: new Set(),
 			proxyUrl: state.proxyUrl,
-			disabledHosts: state.disabledHosts,
-			invertBlocklist: state.invertBlocklist,
+			rules: state.rules,
 			enabled: state.enabled,
 			type: "image",
 		})
@@ -134,8 +150,7 @@ async function handleCompressImage(
 // --- Event Listeners ---
 
 chrome.runtime.onInstalled.addListener(async () => {
-	const stored = await chrome.storage.local.get(null)
-	const state = { ...defaultState, ...stored }
+	const state = await loadStateWithMigration()
 
 	// Check WebP support (hardcoded true for modern Chrome/Edge)
 	state.isWebpSupported = true
@@ -146,9 +161,7 @@ chrome.runtime.onInstalled.addListener(async () => {
 
 chrome.storage.onChanged.addListener(async (changes, namespace) => {
 	if (namespace !== "local") return
-
-	const stored = await chrome.storage.local.get(null)
-	const state = { ...defaultState, ...stored }
+	const state = await loadStateWithMigration()
 
 	// If specific keys changed, update rules
 	if (
@@ -157,7 +170,8 @@ chrome.storage.onChanged.addListener(async (changes, namespace) => {
 		changes.convertBw ||
 		changes.compressionLevel ||
 		changes.disabledHosts ||
-		changes.invertBlocklist
+		changes.invertBlocklist ||
+		changes.rules
 	) {
 		await updateRedirectRules(state)
 	}

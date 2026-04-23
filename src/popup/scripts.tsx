@@ -7,6 +7,7 @@ import Home from "../components/Home"
 import Settings from "../components/Settings"
 import type { ImageFormat } from "../defaults"
 import defaults from "../defaults"
+import type { Rule } from "../rules/types"
 import parseUrl from "../utils/parseUrl"
 
 type ActiveTab = "home" | "sites" | "settings"
@@ -18,8 +19,7 @@ interface PopupState {
 		bytesProcessed: number
 		bytesSaved: number
 	}
-	disabledHosts: string[]
-	invertBlocklist: boolean
+	rules: Rule[]
 	convertBw: boolean
 	compressionLevel: number
 	isWebpSupported: boolean
@@ -34,8 +34,7 @@ class Popup extends React.Component<{ currentUrl: string }, PopupState> {
 		this.state = {
 			enabled: true,
 			statistics: { filesProcessed: 0, bytesProcessed: 0, bytesSaved: 0 },
-			disabledHosts: [],
-			invertBlocklist: false,
+			rules: [],
 			convertBw: false,
 			compressionLevel: 40,
 			isWebpSupported: true,
@@ -50,8 +49,7 @@ class Popup extends React.Component<{ currentUrl: string }, PopupState> {
 			this.setState({
 				enabled: stored.enabled ?? defaults.enabled,
 				statistics: stored.statistics ?? defaults.statistics,
-				disabledHosts: stored.disabledHosts ?? defaults.disabledHosts,
-				invertBlocklist: stored.invertBlocklist ?? defaults.invertBlocklist,
+				rules: stored.rules ?? defaults.rules,
 				convertBw: stored.convertBw ?? defaults.convertBw,
 				compressionLevel: stored.compressionLevel ?? defaults.compressionLevel,
 				isWebpSupported: stored.isWebpSupported ?? true,
@@ -77,38 +75,39 @@ class Popup extends React.Component<{ currentUrl: string }, PopupState> {
 	siteWasDisabled = () => {
 		const { hostname } = parseUrl(this.props.currentUrl)
 		this.setState((prevState) => {
-			const disabledHosts = [...prevState.disabledHosts, hostname]
-			chrome.storage.local.set({ disabledHosts })
-			return { disabledHosts }
+			const nextRule: Rule = {
+				id: crypto.randomUUID(),
+				action: "block",
+				pattern: `${hostname}/**`,
+				patternType: "glob",
+				enabled: true,
+			}
+			const rules = [nextRule, ...prevState.rules]
+			chrome.storage.local.set({ rules })
+			return { rules }
 		})
 	}
 
 	siteWasEnabled = () => {
 		const { hostname } = parseUrl(this.props.currentUrl)
+		const currentSitePattern = `${hostname}/**`
 		this.setState((prevState) => {
-			const disabledHosts = prevState.disabledHosts.filter(
-				(site) => site !== hostname,
+			const rules = prevState.rules.filter(
+				(rule) =>
+					!(
+						rule.action === "block" &&
+						rule.patternType === "glob" &&
+						rule.pattern === currentSitePattern
+					),
 			)
-			chrome.storage.local.set({ disabledHosts })
-			return { disabledHosts }
+			chrome.storage.local.set({ rules })
+			return { rules }
 		})
 	}
 
-	disabledHostsWasChanged = (value: string) => {
-		const disabledHosts = value
-			.split("\n")
-			.map((h) => h.trim())
-			.filter((host) => host !== "")
-		chrome.storage.local.set({ disabledHosts })
-		this.setState({ disabledHosts })
-	}
-
-	invertBlocklistWasChanged = () => {
-		this.setState((prevState) => {
-			const invertBlocklist = !prevState.invertBlocklist
-			chrome.storage.local.set({ invertBlocklist })
-			return { invertBlocklist }
-		})
+	rulesWasChanged = (rules: Rule[]) => {
+		chrome.storage.local.set({ rules })
+		this.setState({ rules })
 	}
 
 	convertBwWasChanged = () => {
@@ -165,7 +164,7 @@ class Popup extends React.Component<{ currentUrl: string }, PopupState> {
 						<Home
 							view="home"
 							statistics={this.state.statistics}
-							disabledHosts={this.state.disabledHosts}
+							rules={this.state.rules}
 							currentUrl={this.props.currentUrl}
 							compressionLevel={this.state.compressionLevel}
 							convertBw={this.state.convertBw}
@@ -176,8 +175,6 @@ class Popup extends React.Component<{ currentUrl: string }, PopupState> {
 							compressionLevelOnChange={this.compressionLevelWasChanged}
 							convertBwOnChange={this.convertBwWasChanged}
 							imageFormatOnChange={this.imageFormatWasChanged}
-							invertBlocklist={this.state.invertBlocklist}
-							onInvertBlocklistChange={this.invertBlocklistWasChanged}
 							onConfigureProxy={() => this.setState({ activeTab: "settings" })}
 						/>
 					)}
@@ -185,7 +182,7 @@ class Popup extends React.Component<{ currentUrl: string }, PopupState> {
 						<Home
 							view="sites"
 							statistics={this.state.statistics}
-							disabledHosts={this.state.disabledHosts}
+							rules={this.state.rules}
 							currentUrl={this.props.currentUrl}
 							compressionLevel={this.state.compressionLevel}
 							convertBw={this.state.convertBw}
@@ -193,12 +190,10 @@ class Popup extends React.Component<{ currentUrl: string }, PopupState> {
 							proxyUrl={this.state.proxyUrl}
 							onSiteDisable={this.siteWasDisabled}
 							onSiteEnable={this.siteWasEnabled}
-							disabledOnChange={this.disabledHostsWasChanged}
+							rulesOnChange={this.rulesWasChanged}
 							compressionLevelOnChange={this.compressionLevelWasChanged}
 							convertBwOnChange={this.convertBwWasChanged}
 							imageFormatOnChange={this.imageFormatWasChanged}
-							invertBlocklist={this.state.invertBlocklist}
-							onInvertBlocklistChange={this.invertBlocklistWasChanged}
 							onConfigureProxy={() => this.setState({ activeTab: "settings" })}
 						/>
 					)}

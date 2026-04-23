@@ -1,3 +1,5 @@
+import { RULES_MIGRATION_VERSION, type Rule } from "./rules/types"
+
 export interface Statistics {
 	filesProcessed: number
 	bytesProcessed: number
@@ -11,6 +13,8 @@ export interface State {
 	statistics: Statistics
 	disabledHosts: string[]
 	invertBlocklist: boolean
+	rules: Rule[]
+	rulesMigrationVersion: number
 	convertBw: boolean
 	compressionLevel: number
 	proxyUrl: string
@@ -28,6 +32,8 @@ const defaultState: State = {
 	},
 	disabledHosts: [],
 	invertBlocklist: false,
+	rules: [],
+	rulesMigrationVersion: RULES_MIGRATION_VERSION,
 	convertBw: false,
 	compressionLevel: 40,
 	proxyUrl: "",

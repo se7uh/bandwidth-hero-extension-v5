@@ -1,7 +1,8 @@
 import type { ImageFormat } from "../defaults"
+import type { Rule } from "../rules/types"
 import CompressionSettings from "./CompressionSettings"
 import DisableButton from "./DisableButton"
-import ManageDisabled from "./ManageDisabled"
+import RulesEditor from "./RulesEditor"
 import { brutalHover } from "./styles"
 import UsageStatistics from "./UsageStatistics"
 
@@ -12,49 +13,39 @@ interface HomeProps {
 		bytesProcessed: number
 		bytesSaved: number
 	}
-	disabledHosts: string[]
+	rules: Rule[]
 	currentUrl: string
 	compressionLevel: number
 	convertBw: boolean
 	imageFormat: ImageFormat
-	invertBlocklist: boolean
 	proxyUrl?: string
 	onSiteDisable: () => void
 	onSiteEnable: () => void
-	disabledOnChange?: (value: string) => void
+	rulesOnChange?: (rules: Rule[]) => void
 	compressionLevelOnChange: (value: number) => void
 	convertBwOnChange: () => void
 	imageFormatOnChange: (format: ImageFormat) => void
-	onInvertBlocklistChange: () => void
 	onConfigureProxy: () => void
 }
 
 export default ({
 	view = "home",
 	statistics,
-	disabledHosts,
+	rules,
 	currentUrl,
 	compressionLevel,
 	convertBw,
 	imageFormat,
-	invertBlocklist,
 	proxyUrl,
 	onSiteDisable,
 	onSiteEnable,
-	disabledOnChange,
+	rulesOnChange,
 	compressionLevelOnChange,
 	convertBwOnChange,
 	imageFormatOnChange,
-	onInvertBlocklistChange,
 }: HomeProps) => {
 	if (view === "sites") {
-		return (
-			<ManageDisabled
-				disabledHosts={disabledHosts}
-				invertBlocklist={invertBlocklist}
-				onChange={disabledOnChange}
-			/>
-		)
+		return <RulesEditor rules={rules} onChange={rulesOnChange ?? (() => {})} />
 	}
 
 	return (
@@ -75,19 +66,11 @@ export default ({
 				bytesSaved={statistics.bytesSaved}
 			/>
 			<DisableButton
-				disabledHosts={disabledHosts}
-				invertBlocklist={invertBlocklist}
+				rules={rules}
 				currentUrl={currentUrl}
 				onSiteDisable={onSiteDisable}
 				onSiteEnable={onSiteEnable}
 			/>
-			<button
-				type="button"
-				onClick={onInvertBlocklistChange}
-				className={`w-full cursor-pointer border-[3px] border-black px-3 py-2.5 font-black text-[13px] uppercase shadow-[4px_4px_0_0_#000] transition-[transform,box-shadow] duration-100 hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[2px_2px_0_0_#000] ${invertBlocklist ? "bg-brut-teal" : "bg-white"}`}
-			>
-				{invertBlocklist ? "Invert Blocklist: ON" : "Invert Blocklist: OFF"}
-			</button>
 			<CompressionSettings
 				convertBw={convertBw}
 				compressionLevel={compressionLevel}

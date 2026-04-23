@@ -1,5 +1,6 @@
 import isImage from "is-image"
-import parseUrl from "../utils/parseUrl"
+import evaluateRules from "../rules/evaluateRules"
+import type { Rule } from "../rules/types"
 import isPrivateNetwork from "./isPrivateNetwork"
 
 interface ShouldCompressOptions {
@@ -7,8 +8,7 @@ interface ShouldCompressOptions {
 	pageUrl: string
 	compressed: Set<string>
 	proxyUrl: string
-	disabledHosts: string[]
-	invertBlocklist?: boolean
+	rules?: Rule[]
 	enabled: boolean
 	type?: string
 }
@@ -18,8 +18,7 @@ const shouldCompress = ({
 	pageUrl,
 	compressed,
 	proxyUrl,
-	disabledHosts,
-	invertBlocklist = false,
+	rules = [],
 	enabled,
 	type = "image",
 }: ShouldCompressOptions): boolean => {
@@ -78,16 +77,8 @@ const shouldCompress = ({
 		return false
 	}
 
-	const pageHost = parseUrl(pageUrl).hostname
-	const imageHost = parseUrl(cleanImageUrl).hostname
-	const isListed =
-		disabledHosts.includes(pageHost) || disabledHosts.includes(imageHost)
-
-	if (!invertBlocklist && isListed) {
-		return false
-	}
-
-	if (invertBlocklist && !isListed) {
+	const decision = evaluateRules(rules, pageUrl, cleanImageUrl)
+	if (decision.matched && !decision.allow) {
 		return false
 	}
 
