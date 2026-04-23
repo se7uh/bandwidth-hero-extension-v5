@@ -1,10 +1,15 @@
+import type { Rule } from "../rules/types"
+import shouldBypassRule from "./shouldBypassRule"
+
 // Check extension state before processing
 let isEnabled = true
+let rules: Rule[] = []
 let observer: MutationObserver | null = null
 
 // Load initial state
-chrome.storage.local.get(["enabled"], (result) => {
+chrome.storage.local.get(["enabled", "rules"], (result) => {
 	isEnabled = (result as { enabled?: boolean }).enabled !== false // default to true
+	rules = (result as { rules?: Rule[] }).rules ?? []
 	if (isEnabled) {
 		init()
 	}
@@ -23,6 +28,10 @@ chrome.storage.onChanged.addListener((changes) => {
 				observer = null
 			}
 		}
+	}
+
+	if (changes.rules) {
+		rules = (changes.rules.newValue as Rule[]) ?? []
 	}
 })
 
@@ -71,6 +80,19 @@ function interceptImage(img: HTMLImageElement) {
 	const originalSrc = img.src
 
 	if (!isValidImageUrl(originalSrc)) {
+		return
+	}
+
+	if (
+		shouldBypassRule({
+			rules,
+			pageUrl: window.location.href,
+			imageUrl: originalSrc,
+		})
+	) {
+		processedImages.add(img)
+		img.dataset.bhOriginal = "true"
+		img.dataset.bhSkipReason = "rule_blocked"
 		return
 	}
 
