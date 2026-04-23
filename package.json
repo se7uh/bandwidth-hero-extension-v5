@@ -1,7 +1,7 @@
 {
 	"name": "bandwidth-hero-extension",
 	"private": true,
-	"version": "5.0.0",
+	"version": "5.1.0",
 	"description": "Browser extension which saves data by compressing images on the page",
 	"license": "MIT",
 	"type": "module",
