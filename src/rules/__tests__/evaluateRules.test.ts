@@ -24,7 +24,7 @@ describe("evaluateRules", () => {
 		const decision = evaluateRules(
 			rules,
 			"https://example.com",
-			"https://example.com/images/covers",
+			"https://example.com/images/covers/hero.webp",
 		)
 
 		expect(decision.matched).toBe(true)

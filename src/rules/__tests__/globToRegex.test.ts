@@ -10,7 +10,9 @@ describe("globToRegex", () => {
 
 	it("does not overmatch sibling prefix", () => {
 		expect(
-			globToRegex("example.com/images/covers/**").test("example.com/images/coversbeta"),
+			globToRegex("example.com/images/covers/**").test(
+				"example.com/images/covers-v2",
+			),
 		).toBe(false)
 	})
 
