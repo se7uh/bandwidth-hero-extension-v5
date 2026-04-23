@@ -151,7 +151,7 @@ class Popup extends React.Component<{ currentUrl: string }, PopupState> {
 		const { activeTab } = this.state
 
 		return (
-			<div className="flex min-h-115 w-95 flex-col bg-brut-yellow outline-[3px] outline-black">
+			<div className="flex h-full w-95 flex-col bg-brut-yellow outline-[3px] outline-black">
 				{/* Header */}
 				<Header
 					enabled={this.state.enabled}

@@ -34,8 +34,12 @@ body {
 
 body.popup {
 	width: 380px;
-	min-height: 460px;
-	height: auto;
+	height: 500px;
+	overflow: hidden;
+}
+
+body.popup #root {
+	height: 100%;
 }
 
 /* Range input brutalist style */
